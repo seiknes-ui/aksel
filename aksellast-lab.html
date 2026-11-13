@@ -1,0 +1,1249 @@
+<title>Aksellast-lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: one workbench – the vehicle stage spans the width, results and vognkort sit below in two columns */
+:root{
+  --bg:#ECEFF1; --surface:#FFFFFF; --surface-2:#F4F6F7; --ink:#15202A; --muted:#566370; --line:#D0D8DD;
+  --accent:#E0A000; --accent-ink:#2E2100; --steel:#2B5E83;
+  --ok:#1D7A43; --ok-bg:#E2F2E8; --bad:#BF3328; --bad-bg:#FAE5E2; --warn:#9A6200; --warn-bg:#FBF0D6;
+  --cab:#2B5E83; --glass:#BFD6E6; --chassis:#36414A; --deck:#87929A; --tyre:#1E2429; --rim:#C5CCD1; --ground:#A9B3BA;
+  --c-pall:#CFA266; --c-stal:#8494A1; --c-betong:#B3ACA2; --c-maskin:#E8B020; --c-egen:#9C8FD0; --c-base:#7A5B33; --cargo-ink:#1A1A1A; --k-f:#B4366F; --k-a:#6D4BC4; --k-p:#0E7A70;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:Barlow,"Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11171C; --surface:#182129; --surface-2:#1E2831; --ink:#E4EAEE; --muted:#97A4AE; --line:#2C3842;
+  --accent:#F2B82A; --accent-ink:#2E2100; --steel:#73A8CE;
+  --ok:#52C47F; --ok-bg:#16301F; --bad:#F06C60; --bad-bg:#3A1C19; --warn:#E9B04A; --warn-bg:#36290F;
+  --cab:#4A84AE; --glass:#8FB4CD; --chassis:#8995A0; --deck:#6F7B84; --tyre:#05080A; --rim:#7E8A93; --ground:#4A5660;
+  --c-pall:#C09157; --c-stal:#7C8C99; --c-betong:#9C958B; --c-maskin:#D9A21C; --c-egen:#8C7FC4; --c-base:#5E4425; --cargo-ink:#121212; --k-f:#F17DB0; --k-a:#B49CF2; --k-p:#4FD1C0;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11171C; --surface:#182129; --surface-2:#1E2831; --ink:#E4EAEE; --muted:#97A4AE; --line:#2C3842;
+  --accent:#F2B82A; --accent-ink:#2E2100; --steel:#73A8CE;
+  --ok:#52C47F; --ok-bg:#16301F; --bad:#F06C60; --bad-bg:#3A1C19; --warn:#E9B04A; --warn-bg:#36290F;
+  --cab:#4A84AE; --glass:#8FB4CD; --chassis:#8995A0; --deck:#6F7B84; --tyre:#05080A; --rim:#7E8A93; --ground:#4A5660;
+  --c-pall:#C09157; --c-stal:#7C8C99; --c-betong:#9C958B; --c-maskin:#D9A21C; --c-egen:#8C7FC4; --c-base:#5E4425; --cargo-ink:#121212; --k-f:#F17DB0; --k-a:#B49CF2; --k-p:#4FD1C0;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3,h4{font-family:var(--f-display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:.005em}
+h1{font-size:2rem;line-height:1.05}
+h2{font-size:1.25rem}
+h3{font-size:1.05rem}
+h4{font-size:1rem;margin-top:14px}
+.num,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:44px;height:44px;flex:none}
+.brand p{margin:2px 0 0;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.label{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+select,input[type=number],input[type=text]{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+.seg{display:flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:7px 10px;cursor:pointer;font-family:var(--f-mono);font-size:.85rem;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.panel-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:10px}
+.hint{color:var(--muted);font-size:.9rem;margin:0}
+
+/* challenges */
+.ch-list{display:flex;flex-wrap:wrap;gap:8px}
+.ch-btn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface-2);border-radius:999px;padding:6px 12px 6px 6px;cursor:pointer}
+.ch-btn .n{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--line);font-family:var(--f-mono);font-size:.8rem}
+.ch-btn.done .n{background:var(--ok);color:var(--surface)}
+.ch-btn[aria-pressed="true"]{border-color:var(--ink);background:var(--surface)}
+.ch-btn[aria-pressed="true"] .n{background:var(--ink);color:var(--surface)}
+.ch-active{margin-top:12px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:12px 24px;border-top:1px dashed var(--line);padding-top:12px}
+.ch-active p{margin:4px 0 0;max-width:65ch}
+.goals{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.goals li{display:flex;gap:8px;align-items:flex-start}
+.goals .mk{flex:none;width:20px;height:20px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:.75rem;font-weight:700;margin-top:1px}
+.goals li.met .mk{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.win{margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--ok-bg);color:var(--ok);font-weight:600}
+
+/* stage */
+.status-row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-bottom:8px}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;font-weight:600}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill .dot{width:9px;height:9px;border-radius:50%;background:currentColor}
+.kpi{display:flex;gap:6px;align-items:baseline;color:var(--muted)}
+.kpi b{color:var(--ink);font-family:var(--f-mono);font-weight:600}
+.stage-scroll{overflow-x:auto;border-radius:8px;background:var(--surface-2)}
+#stage{display:block;width:100%;min-width:760px;height:auto;user-select:none;-webkit-user-select:none}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.85rem;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:18px;height:0;border-top:3px solid var(--accent);vertical-align:middle;margin-right:6px}
+.legend i.ltp{border-top:3px dashed var(--steel)}
+.fifth-ctl{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--warn-bg)}
+.fifth-ctl input[type=range]{width:min(320px,100%);accent-color:var(--accent)}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:8px;padding:6px 12px;cursor:pointer;font-weight:600}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.add-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:12px}
+.add-row .chip{border:1px dashed var(--muted);background:var(--surface);border-radius:8px;padding:5px 10px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.add-row .chip:hover{border-style:solid}
+.sw{width:12px;height:12px;border-radius:3px;display:inline-block;flex:none}
+.custom{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.custom input{width:92px}
+
+/* svg */
+.ground{stroke:var(--ground);stroke-width:6}
+.cab{fill:var(--cab)} .glass{fill:var(--glass)} .chassis{fill:var(--chassis)} .deck{fill:var(--deck)}
+.tyre{fill:var(--tyre);stroke:var(--rim);stroke-width:3} .rim{fill:var(--rim)}
+.fifth{fill:var(--accent)} .hitch{fill:var(--accent);stroke:var(--chassis);stroke-width:4}
+.drawbar{stroke:var(--chassis);stroke-width:12;stroke-linecap:round;fill:none}
+.it{cursor:grab;touch-action:none}
+.it rect.body{stroke:var(--cargo-ink);stroke-opacity:.35;stroke-width:3}
+.it.sel rect.body{stroke:var(--ink);stroke-opacity:1;stroke-width:7}
+.it.dragging{cursor:grabbing}
+.it-pall{fill:var(--c-pall)} .it-stal{fill:var(--c-stal)} .it-betong{fill:var(--c-betong)} .it-maskin{fill:var(--c-maskin)} .it-egen{fill:var(--c-egen)}
+.it-base{fill:var(--c-base)}
+.it text{fill:var(--cargo-ink);font-family:var(--f-mono);font-size:30px;font-weight:600;text-anchor:middle;pointer-events:none}
+.mk-cg{stroke:var(--accent);stroke-width:5}
+.mk-ltp{stroke:var(--steel);stroke-width:5;stroke-dasharray:14 10}
+.mk-t{font-family:var(--f-display);font-weight:700;font-size:30px;text-anchor:middle}
+.mk-t.cg{fill:var(--accent)} .mk-t.ltp{fill:var(--steel)}
+.al .arrow{fill:none;stroke-width:7;stroke-linecap:round;stroke-linejoin:round}
+.al text{text-anchor:middle}
+.al-val{font-family:var(--f-mono);font-weight:600;font-size:40px}
+.al-lim{font-family:var(--f-mono);font-size:25px;fill:var(--muted)}
+.al-name{font-family:var(--f-body);font-size:25px;fill:var(--muted)}
+.st-ok .arrow,.st-full .arrow{stroke:var(--ok)} .st-ok .al-val,.st-full .al-val{fill:var(--ok)}
+.st-bad .arrow,.st-neg .arrow{stroke:var(--bad)} .st-bad .al-val,.st-neg .al-val{fill:var(--bad)}
+.dim{stroke:var(--muted);stroke-width:3}
+.dim-t{fill:var(--muted);font-family:var(--f-body);font-size:26px;text-anchor:middle}
+.ltp-dim .dim,.dim-ltp{stroke:var(--steel)} .ltp-dim .dim-t{fill:var(--steel);font-weight:600}
+
+/* grid */
+.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid,.ch-active{grid-template-columns:minmax(0,1fr)}}
+
+/* results table */
+.tbl-wrap{overflow-x:auto}
+table.res{width:100%;border-collapse:collapse;font-size:.9rem}
+table.res th,table.res td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.res thead th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+table.res td.num{text-align:right;white-space:nowrap}
+table.res tr.sec th{background:var(--surface-2);font-family:var(--f-display);font-size:.95rem}
+.lims{display:flex;flex-direction:column;gap:2px}
+.lims span{color:var(--muted);font-size:.82rem}
+.lims span.gov{color:var(--ink);font-weight:600}
+.lims span.gov::before{content:"▸ "}
+.bar{position:relative;height:10px;border-radius:5px;background:var(--surface-2);border:1px solid var(--line);min-width:90px;overflow:hidden}
+.bar b{position:absolute;inset:0 auto 0 0;background:var(--ok);border-radius:5px}
+.bad .bar b,.neg .bar b{background:var(--bad)}
+.pct{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);margin-top:3px}
+tr.bad td:first-child,tr.neg td:first-child{box-shadow:inset 4px 0 0 var(--bad)}
+tr.bad .v,tr.neg .v{color:var(--bad);font-weight:600}
+.warns{margin:10px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.warns li{background:var(--warn-bg);color:var(--warn);padding:6px 10px;border-radius:6px;font-size:.88rem}
+
+/* items */
+.items{display:flex;flex-direction:column;gap:6px}
+.item-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.item-row.sel{border-color:var(--ink)}
+.item-row .nm{font-weight:600}
+.item-row .pos{font-size:.82rem;color:var(--muted)}
+.item-row .ed{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.item-row .ed label{display:flex;gap:6px;align-items:center;font-size:.85rem;color:var(--muted)}
+.item-row .ed input{width:90px}
+.icon-btn{border:1px solid var(--line);background:var(--surface);border-radius:6px;min-width:32px;height:30px;cursor:pointer;font-family:var(--f-mono)}
+.empty{color:var(--muted);font-style:italic;margin:0}
+
+/* steps */
+.steps ol{margin:6px 0 0;padding-left:1.3em;display:flex;flex-direction:column;gap:6px;max-width:72ch}
+.steps ul.calc{margin:4px 0;padding-left:1.1em;font-family:var(--f-mono);font-size:.82rem;color:var(--muted)}
+.steps b{font-family:var(--f-mono);font-weight:600}
+.formula{display:inline-block;margin-top:4px;padding:4px 8px;border-radius:6px;background:var(--surface-2);font-family:var(--f-mono);font-size:.85rem}
+
+/* LTP-formelen */
+.ltp-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:14px}
+.ltp-card{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--surface-2);min-width:0}
+.ltp-card h3{margin:0 0 10px;font-family:var(--f-display);font-size:1.15rem}
+.ltp-eq{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;font-family:var(--f-mono);font-size:1.05rem}
+.ltp-eq .op{color:var(--muted)}
+.ltp-eq .op.lt{color:var(--steel);font-weight:600}
+.frac{display:inline-flex;flex-direction:column;align-items:center;max-width:100%}
+.frac .fn{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 8px;padding:0 4px 7px;border-bottom:2px solid var(--ink)}
+.frac .fd{padding-top:7px}
+.kv{display:flex;flex-direction:column;align-items:center;padding:4px 10px;border-radius:6px;border:2px solid var(--kc);background:var(--surface)}
+.kv small{font-family:var(--f-body);font-size:.72rem;font-weight:600;color:var(--kc);white-space:nowrap}
+.kv b{color:var(--kc);font-weight:600;white-space:nowrap}
+.k-f{--kc:var(--k-f)} .k-a{--kc:var(--k-a)} .k-p{--kc:var(--k-p)} .k-r{--kc:var(--steel)}
+.ltp-where{margin:6px 0 0;font-size:.88rem;color:var(--muted)}
+.ltp-src{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:10px;font-size:.9rem}
+.ltp-src>li{border-left:4px solid var(--kc);padding:2px 0 2px 10px}
+.ltp-src .h{display:block;font-weight:700;color:var(--kc)}
+.ltp-src ul{margin:2px 0 0;padding-left:1.1em}
+.ltp-src li.gov{font-weight:600}
+.ltp-src li.alt{color:var(--muted)}
+.ltp-src b{font-family:var(--f-mono);font-weight:600}
+.tag{display:inline-block;font-size:.72rem;font-weight:500;padding:0 6px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--surface);white-space:nowrap;vertical-align:1px}
+.tag.vk{border-color:var(--steel);color:var(--steel)}
+.tag.vl{border-color:var(--warn);color:var(--warn)}
+.cmp{color:var(--muted);font-size:.82rem;font-weight:400}
+details>summary{cursor:pointer;font-family:var(--f-display);font-weight:700;font-size:1.25rem;list-style-position:outside}
+
+/* vognkort */
+.setup{display:flex;flex-direction:column;gap:14px}
+.vk-details>summary{font-size:1.15rem;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.vk-details>summary .hint{font-family:var(--f-body);font-weight:400;font-size:.88rem}
+.vk{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px;margin-top:10px}
+.rule{margin-top:10px;padding:10px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--line);max-width:80ch}
+.rule ol{margin:6px 0;padding-left:1.3em}
+.rule p{margin:4px 0}
+.quiz{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.quiz input{width:110px}
+.goals li.met .quiz input{border-color:var(--ok)}
+.vk-card{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface-2)}
+.vk-card h3{display:flex;justify-content:space-between;gap:8px;margin-bottom:8px}
+.vk-card h3 small{font-family:var(--f-mono);font-weight:500;color:var(--muted);font-size:.75rem}
+.vk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.vk-grid .field input,.vk-grid .field select{width:100%}
+.vk-grid .field.err input{border-color:var(--bad)}
+.vk-grid .field .label{text-transform:none;letter-spacing:0;font-size:.8rem}
+.chk{display:flex;gap:8px;align-items:center;font-size:.85rem}
+footer{color:var(--muted);font-size:.85rem;max-width:90ch}
+footer p{margin:4px 0}
+@media (prefers-reduced-motion:no-preference){.bar b{transition:width .15s}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 44 44" aria-hidden="true"><rect x="1" y="1" width="42" height="42" rx="9" fill="var(--accent)"/><rect x="7" y="13" width="22" height="12" rx="2" fill="var(--accent-ink)"/><rect x="29" y="17" width="8" height="8" rx="2" fill="var(--accent-ink)"/><circle cx="13" cy="30" r="4" fill="var(--accent-ink)"/><circle cx="31" cy="30" r="4" fill="var(--accent-ink)"/><path d="M13 36v4M31 36v4" stroke="var(--accent-ink)" stroke-width="3" stroke-linecap="round"/></svg>
+      <div>
+        <h1>Aksellast-lab</h1>
+        <p>Plasser lasten og se hvordan vekten fordeler seg på akslene.</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="panel setup" aria-label="Kjøretøy og vognkort">
+    <div class="controls">
+      <label class="field"><span class="label">Kjøretøy</span><select id="preset"></select></label>
+      <div class="field"><span class="label">Bruksklasse</span><div class="seg" id="bk" role="group" aria-label="Bruksklasse"></div></div>
+      <label class="field"><span class="label">Tillatt lengde på vegen</span>
+        <select id="road"><option value="1950">19,50 m</option><option value="1500">15,00 m</option><option value="1240">12,40 m</option></select></label>
+    </div>
+    <details open class="vk-details"><summary>Vognkort <span class="hint">Endre tallene for å prøve andre kjøretøy.</span></summary>
+      <div class="vk" id="vk"></div>
+    </details>
+  </section>
+
+  <section class="panel" aria-labelledby="chTitle">
+    <div class="panel-head"><h2 id="chTitle">Utfordringer</h2><p class="hint">Velg en oppgave, eller utforsk fritt med kjøretøyvalget øverst.</p></div>
+    <div class="ch-list" id="chList"></div>
+    <div id="chActive"></div>
+  </section>
+
+  <section class="panel" aria-label="Kjøretøy og last">
+    <div class="status-row" id="statusRow"></div>
+    <div class="stage-scroll"><svg id="stage" role="img" aria-label="Kjøretøyet sett fra siden med last og aksellaster"></svg></div>
+    <div class="legend">
+      <span><i></i>Lastens tyngdepunkt (TP)</span>
+      <span><i class="ltp"></i>LTP: der lastens tyngdepunkt bør ligge for å utnytte alle aksler fullt</span>
+      <span>Dra lasten med mus eller finger. Tallene under hjulene viser aksellasten.</span>
+    </div>
+    <div id="fifthCtl"></div>
+    <div class="add-row" id="addRow"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="ltpTitle">
+    <div class="panel-head"><h2 id="ltpTitle">LTP-formelen</h2><p class="hint">Fargene viser hvor hvert tall kommer fra. <span class="tag vk">Vognkort</span> er kjøretøyets egne grenser. <span class="tag vl">Vegliste</span> er det vegen tillater etter bruksklassen. Laveste gjelder. Svaret er den blå stiplede LTP-linja i tegningen.</p></div>
+    <div class="ltp-cards" id="ltpBox"></div>
+  </section>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="resTitle">
+      <div class="panel-head"><h2 id="resTitle">Kontroll</h2><p class="hint">Laveste grense gjelder (▸).</p></div>
+      <div class="tbl-wrap"><table class="res" id="res"></table></div>
+      <ul class="warns" id="warns"></ul>
+    </section>
+    <section class="panel" aria-labelledby="itTitle">
+      <div class="panel-head"><h2 id="itTitle">Last</h2><p class="hint" id="cargoSum"></p></div>
+      <div class="items" id="items"></div>
+    </section>
+  </div>
+
+  <section class="panel steps">
+    <details open><summary>Slik regnes det</summary><div id="steps"></div></details>
+  </section>
+
+  <footer>
+    <p>Grenseverdiene er hentet fra <i>Normaltransport – utdrag fra forskrift om bruk av kjøretøy kap. 5</i> (Statens vegvesen, 1. mai 2023), tabell 1–4.</p>
+    <p>Forenklinger: last i en boggi eller trippelboggi fordeles likt på akslene. Lasten regnes med tyngdepunkt midt på kolliet. Slepvogn gir ingen vertikal last på kroken, og har 1 aksel foran ved 2 og 3 aksler, 2 foran ved 4 aksler. 150/300-regelen for fast svingskive er en tommelfingerregel fra læreboka. Ikke med: buss, motorvogn med 5 aksler eller flere, tillegg for alternativt drivstoff og nullutslipp, og lastsikring. Verktøyet er laget for opplæring og erstatter ikke vognkort, skilt eller veglister.</p>
+  </footer>
+</div>
+
+<script>
+/* ---------- regelverk (tabell 1–4) ---------- */
+const BK=[{id:'Bk10/50',cls:0,max:50},{id:'Bk10/42',cls:0,max:42},{id:'BkT8/50',cls:1,max:50},{id:'BkT8/40',cls:1,max:40},{id:'Bk8/32',cls:2,max:32},{id:'Bk6/28',cls:3,max:28}];
+const CLS=['Bk10','BkT8','Bk8','Bk6'];
+// Tabell 1, kolonner Bk10, BkT8, Bk8, Bk6 (tonn)
+const T1={
+  single:[10,8,8,6], drive:[11.5,8,8,6],
+  boggi:[{min:1.30,lbl:'1,30–1,79 m',v:[18,14,12,9]},{min:1.20,lbl:'1,20–1,29 m',v:[16,12,12,9]},{min:0.80,lbl:'0,80–1,19 m',v:[15,11.5,11.5,8.5]},{min:0,lbl:'under 0,80 m',v:[10,8,8,6]}],
+  tri:[{lbl:'1,30–1,79 m',v:[24,19,16,12]},{lbl:'1,00–1,29 m',v:[22,18,16,12]},{lbl:'under 1,00 m',v:[16,12,12,9]}]
+};
+// Tabell 2, kolonner Bk10/50, Bk10/42, BkT8/50, BkT8/40, Bk8/32, Bk6/28 (tonn)
+const T2={
+  motor2:[19,19,16,16,16,12], motor3:[26,26,22,22,20,15],
+  slep2:[20,20,16,16,16,12], slep3:[28,25,22,22,19,15], slep4:[30,25,28,24,19,17],
+  semi1:[10,10,8,8,8,6], semi2:[18,18,14,14,12,9], semi3:[24,24,19,19,16,12]
+};
+// Motorvogn med 4 aksler og flere: etter avstand fra første til siste aksel (m)
+const T2_4=[[0,[26,26,22,22,20,15]],[5.4,[30,30,26,26,22,16]],[5.6,[31,31,27,27,23,17]],[5.8,[32,32,28,28,24,18]]];
+const LOW2=[19,19,16,16,16,12], LOW3=[26,26,22,22,20,15], LOW4=[32,32,28,28,24,18];
+// Tabell 3a (slepvogn): [minsteavstand fra (m), verdier]
+const T3A={
+  '2-2':[[0,LOW2],[3,[39,39,32,32,32,24]]],
+  '2-3':[[0,LOW2],[3,[47,42,38,38,32,27]]],
+  '2-4':[[0,LOW2],[3,[47,42,40,40,32,28]]],
+  '3-2':[[0,LOW3],[3,[40,40,38,38,30,24]],[3.7,[46,42,38,38,32,27]]],
+  '3-3':[[0,LOW3],[3,[47,42,44,40,32,28]],[3.7,[50,42,44,40,32,28]]],
+  '3-4':[[0,LOW3],[3,[50,42,50,40,32,28]]],
+  '4-2':[[0,LOW4],[3,[47,42,43,40,32,28]],[3.7,[50,42,43,40,32,28]]],
+  '4-3':[[0,LOW4],[3,[50,42,50,40,32,28]]],
+  '4-4':[[0,LOW4],[3,[50,42,50,40,32,28]]]
+};
+// Tabell 3b (påhengsvogn/semitrailer). 2w = 2 aksler i avstand over 1,79 m
+const T3B={
+  '2-1':[[0,LOW2],[3,[29,29,24,24,24,18]]],
+  '2-2':[[0,LOW2],[3,[34,34,30,30,26,21]],[3.2,[35,35,30,30,27.1,21]],[3.4,[36,36,30,30,28,21]],[3.7,[37,37,30,30,28,21]]],
+  '2-2w':[[0,LOW2],[3,[37,36,32,32,28,23]],[3.4,[38,36.8,32,32,28.6,24]],[3.7,[39,37.4,32,32,29,24]]],
+  '2-3':[[0,LOW2],[3,[37,36,35,35,28,23]],[3.4,[38,36.8,35,35,28.6,24]],[3.7,[39,37.4,35,35,29,24]],[4.0,[40,37.9,35,35,29.4,24]],[4.3,[41,38.5,35,35,29.8,24]],[4.6,[42,39.1,35,35,30.3,24]],[4.9,[43,39.7,35,35,30.7,24]],[5.3,[46,40.5,35,35,31.4,24]],[5.7,[46,41.3,35,35,32,24]],[6.1,[46,42,35,35,32,24]]],
+  '3-1':[[0,LOW3],[3,[33,33,30,30,26,21]],[3.2,[34,34,30,30,26.7,21]],[3.6,[35,35,30,30,27.4,21]],[4.0,[36,36,30,30,28,21]]],
+  '3-2':[[0,LOW3],[3,[37,36,36,36,28,24]],[3.3,[38,36.6,36,36,28.4,24]],[3.6,[39,37.1,36,36,28.9,24]],[3.9,[40,37.7,36,36,29.3,24]],[4.1,[41,38.1,36,36,29.6,24]],[4.3,[42,38.4,36,36,29.9,24]],[4.5,[43,38.8,36,36,30.2,24]],[4.7,[44,39.2,36,36,30.5,24]],[5.2,[44,40,36,36,31.3,24]],[5.7,[44,41,36,36,32,24]],[6.2,[44,42,36,36,32,24]]],
+  '3-2w':[[0,LOW3],[3,[41,39,38,38,30,25]],[3.3,[42,39.5,38,38,30.4,25.5]],[3.6,[43,40,38,38,30.8,26]],[3.9,[44,40.5,38,38,31.2,26.5]],[4.2,[45,41,38,38,31.6,27]],[4.5,[46,41.5,38,38,32,27]]],
+  '3-3':[[0,LOW3],[3,[41,39,41,39,30,25]],[3.3,[42,39.5,41,39.3,30.4,25.5]],[3.6,[43,40,41,39.7,30.8,26]],[3.9,[44,40.5,41,40,31.2,26.5]],[4.2,[45,41,41,40,31.6,27]],[4.5,[46,41.5,41,40,32,27]],[4.8,[47,42,41,40,32,27]],[5.1,[48,42,41,40,32,27]],[5.4,[49,42,41,40,32,27]],[5.7,[50,42,41,40,32,27]]],
+  '4-1':[[0,LOW4],[3,[38,36,36,36,28,23]],[3.3,[39,36.5,36,36,28.4,23.5]],[3.6,[40,37,36,36,28.9,24]],[3.9,[41,37.5,36,36,29.3,24]],[4.2,[42,38,36,36,29.8,24]],[4.7,[42,39,36,36,30.5,24]],[5.2,[42,40,36,36,31.3,24]],[5.7,[42,41,36,36,32,24]],[6.4,[42,42,36,36,32,24]]],
+  '4-2':[[0,LOW4],[3,[42,38,42,38,29,25]],[3.4,[43,38.8,42,38.7,29.7,25.6]],[3.8,[44,39.6,42,39.4,30.4,26.1]],[4.1,[45,40.2,42,40,30.9,26.6]],[4.4,[46,40.8,42,40,31.5,27]],[4.7,[47,41.4,42,40,32,27]],[5.0,[48,42,42,40,32,27]],[5.3,[49,42,42,40,32,27]],[5.6,[50,42,42,40,32,27]]],
+  '4-2w':[[0,LOW4],[3,[46,40,46,40,31,27]],[3.4,[48,41.5,47,40,32,27.5]],[3.8,[49,42,47,40,32,28]],[4.2,[50,42,47,40,32,28]]]
+};
+T3B['4-3']=T3B['4-2w'];
+
+/* ---------- last og eksempler ---------- */
+const TPL={
+  pall:{name:'Pall',kg:1000,len:120,h:140,cat:'pall'},
+  pall15:{name:'Pall',kg:1500,len:120,h:150,cat:'pall'},
+  betong:{name:'Betongelement',kg:4000,len:250,h:90,cat:'betong'},
+  bjelke:{name:'Stålbjelker',kg:5000,len:300,h:70,cat:'stal'},
+  kveil:{name:'Stålkveil',kg:9000,len:160,h:150,cat:'stal',coil:true},
+  graver:{name:'Minigraver',kg:3500,len:330,h:250,cat:'maskin'}
+};
+const TRUCK_LB2={kind:'lastebil',n:2,sp:[500],tare:[5400,2600],allow:[7500,11500],total:19000,train:0,coupling:0,air:true,front:140,deck:[110,780],hitch:790,rear:790,fifth:0,fifthMove:true,fifthRange:[0,120]};
+const TRUCK_LB3={kind:'lastebil',n:3,sp:[460,135],tare:[6200,4300],allow:[8000,19000],total:26000,train:0,coupling:0,air:true,front:145,deck:[105,820],hitch:830,rear:830,fifth:0,fifthMove:true,fifthRange:[0,120]};
+const SEMI3={kind:'semi',n:3,sp:[770,131,131],tare:[2700,4300],allow:[12000,27000],total:39000,deck:[-160,1200]};
+const PRESETS={
+  lb2:{label:'Lastebil, 2 aksler',truck:TRUCK_LB2,trailer:null,
+    items:[['pall','truck',170],['pall','truck',290],['pall','truck',410],['pall','truck',530],['pall','truck',650]]},
+  lb3:{label:'Lastebil, 3 aksler',truck:TRUCK_LB3,trailer:null,
+    items:[['betong','truck',270],['betong','truck',520],['pall','truck',730]]},
+  tb2s3:{label:'Trekkbil 2 aksler + semitrailer 3 aksler',
+    truck:{kind:'trekkbil',n:2,sp:[380],tare:[5300,2400],allow:[8000,11500],total:19000,train:46000,coupling:12000,air:true,front:140,deck:[0,0],hitch:0,rear:470,fifth:60,fifthMove:true,fifthRange:[0,120]},
+    trailer:SEMI3,
+    items:[['bjelke','trailer',300],['bjelke','trailer',600],['bjelke','trailer',900]]},
+  tb3s3:{label:'Trekkbil 3 aksler + semitrailer 3 aksler',
+    truck:{kind:'trekkbil',n:3,sp:[360,135],tare:[6200,3300],allow:[8000,19000],total:26000,train:50000,coupling:18000,air:true,front:140,deck:[0,0],hitch:0,rear:520,fifth:40,fifthMove:true,fifthRange:[-20,110]},
+    trailer:{...SEMI3,allow:[15000,27000]},
+    items:[['betong','trailer',-30],['betong','trailer',230],['betong','trailer',490],['betong','trailer',750],['betong','trailer',1010],['kveil','trailer',600]]},
+  lb4tri:{label:'Lastebil 4 aksler, trippelboggi bak',
+    truck:{...TRUCK_LB3,n:4,cfg:'tri',steer2:true,sp:[450,135,135],tare:[6800,6200],allow:[9000,24000],total:32000,deck:[105,880],hitch:890,rear:890},trailer:null,
+    items:[['betong','truck',255],['betong','truck',505],['betong','truck',755],['bjelke','truck',560]]},
+  lb4bb:{label:'Lastebil 4 aksler, boggi foran og bak',
+    truck:{...TRUCK_LB3,n:4,cfg:'bb',steer2:true,sp:[180,320,135],tare:[8400,5600],allow:[16000,19000],total:32000,deck:[110,800],hitch:810,rear:810},trailer:null,
+    items:[['betong','truck',235],['betong','truck',485],['betong','truck',675],['pall15','truck',400],['pall15','truck',400]]},
+  lb3sl3:{label:'Lastebil 3 aksler + slepvogn 3 aksler',
+    truck:{...TRUCK_LB3,deck:[105,740],hitch:760,rear:760,train:50000},
+    trailer:{kind:'slepvogn',n:3,sp:[260,630,131],tare:[3000,3800],allow:[10000,18000],total:26000,deck:[140,1030]},
+    items:[['betong','truck',260],['betong','truck',510],['pall15','truck',680],['betong','trailer',390],['betong','trailer',640],['betong','trailer',890]]},
+  lb2ph2:{label:'Lastebil 2 aksler + påhengsvogn 2 aksler',
+    truck:{...TRUCK_LB2,train:34000,coupling:1000},
+    trailer:{kind:'pahengsvogn',n:2,sp:[480,131],tare:[300,3200],allow:[1000,18000],total:18000,deck:[110,830]},
+    items:[['pall','truck',170],['pall','truck',290],['pall','truck',410],['pall15','trailer',300],['pall15','trailer',450],['pall15','trailer',600],['pall15','trailer',750]]}
+};
+
+/* ---------- utfordringer ---------- */
+const CH=[
+  {id:'c1',title:'Tungt bak',preset:'lb2',bk:0,
+    items:[['pall15','truck',720],['pall15','truck',720],['pall15','truck',720],['pall15','truck',600],['pall15','truck',600]],
+    text:'Fem paller på 1 500 kg står helt bakerst på lasteplanet. Bakakselen er overbelastet, mens framakselen har lite last. Flytt pallene slik at alle aksler er innenfor grensene.',
+    goals:[['Ingen grenser er overskredet',(s,r)=>r.ok],['Alle fem pallene er fortsatt på bilen',s=>s.items.length>=5]]},
+  {id:'c2',title:'Stålkveilen',preset:'lb3',bk:0,items:[['kveil','truck',700]],
+    text:'Bilen skal kjøre på en veg med bruksklasse Bk8/32. Velg riktig bruksklasse øverst, og finn en plassering av stålkveilen på 9 000 kg som er lovlig. Det blåstiplede LTP-merket viser hvor tyngdepunktet bør ligge.',
+    goals:[['Bruksklasse Bk8/32 er valgt',s=>s.bk===4],['Ingen grenser er overskredet',(s,r)=>r.ok]]},
+  {id:'c3',title:'Flytt svingskiva',preset:'tb2s3',bk:0,truck:{fifth:0},
+    items:[['bjelke','trailer',100],['bjelke','trailer',400],['bjelke','trailer',700],['bjelke','trailer',1050]],
+    text:'Svingskiva står rett over drivakselen, og drivakselen er overbelastet. La lasten ligge. Flytt svingskiva med glidebryteren slik at framakselen får minst 90 % av det den tåler, uten at noe blir overbelastet.',
+    goals:[['Ingen grenser er overskredet',(s,r)=>r.ok],['Trekkbilens framaksel er utnyttet minst 90 %',(s,r)=>r.g.T.groups[0].row.q>=0.9]]},
+  {id:'c9',title:'Fast svingskive',preset:'tb2s3',bk:3,truck:{fifthMove:false},hide:['rule'],
+    items:[['bjelke','trailer',100],['bjelke','trailer',400],['bjelke','trailer',700],['bjelke','trailer',1050]],
+    text:'Denne trekkbilen har fastmontert svingskive, plassert etter LTP for Bk10. Nå skal vogntoget kjøre på BkT8/40, der drivakselen bare tåler 8 tonn. Bruk 300-regelen: framakselen reduseres med 300 kg for hvert hele tonn bakakselen må reduseres under det vognkortet tillater. Svar på spørsmålet, og last om vogntoget så det blir lovlig med minst 15 tonn last.',
+    goals:[{q:'Hvor mange kg kan framakselen regnes med?',unit:'kg',tol:50,ans:(s,r)=>r.rule.plan},
+      {t:'Ingen grenser er overskredet',f:(s,r)=>r.ok},{t:'Minst 15 000 kg last',f:(s,r)=>r.cargo>=15000}]},
+  {id:'c4',title:'Lavere bruksklasse',preset:'tb3s3',bk:0,
+    text:'Vogntoget er lovlig lastet for Bk10/50, men neste strekning er BkT8/40. Bytt bruksklasse, og fjern eller flytt last til alt er lovlig. Du skal fortsatt ha med minst 20 tonn last.',
+    goals:[['Bruksklasse BkT8/40 er valgt',s=>s.bk===3],['Ingen grenser er overskredet',(s,r)=>r.ok],['Minst 20 000 kg last',(s,r)=>r.cargo>=20000]]},
+  {id:'c5',title:'Påhengsvogn i balanse',preset:'lb2ph2',bk:0,
+    items:[['pall','truck',170],['pall','truck',290],['pall','truck',410],['pall15','trailer',170],['pall15','trailer',290],['pall15','trailer',410],['pall15','trailer',530]],
+    text:'Pallene på påhengsvogna står helt framme, så koplingslasten er altfor høy. Flytt dem bakover til koplingslasten er lovlig. Den må ikke bli negativ, for da løfter vogna i kroken.',
+    goals:[['Ingen grenser er overskredet',(s,r)=>r.ok],['Alle fire pallene står på påhengsvogna',s=>s.items.filter(i=>i.unit==='trailer').length>=4]]},
+  {id:'c6',title:'Full last',preset:'lb2',bk:0,items:[],
+    text:'Lastebilen er tom. Legg på minst 10 000 kg last med knappene under bildet, uten å overskride noen grense. Paller kan stables. Tips: legg lastens tyngdepunkt nær LTP-merket.',
+    goals:[['Minst 10 000 kg last',(s,r)=>r.cargo>=10000],['Ingen grenser er overskredet',(s,r)=>r.ok]]},
+  {id:'c7',title:'Minsteavstand semitrailer',preset:'tb2s3',bk:0,hide:['mins','t3'],
+    text:'Bruk vognkortene øverst og svingskivas plassering (under bildet). Minsteavstanden er avstanden fra bakerste aksel på trekkbilen til fremste aksel på semitraileren. Svar i meter med to desimaler og i tonn.',
+    goals:[{q:'Avstand fra trekkbilens framaksel til svingskiva (king-pin)?',unit:'m',tol:0.011,ans:(s,r)=>(r.g.T.x2-s.truck.fifth)/100},
+      {q:'Minsteavstand?',unit:'m',tol:0.011,ans:(s,r)=>r.g.mins/100},
+      {q:'Største vogntogvekt etter tabell 3b på Bk10/50?',unit:'t',tol:0.05,ans:s=>t3Limit({...s,bk:0},geom(s).mins).kg/1000}]},
+  {id:'c8',title:'Minsteavstand slepvogn',preset:'lb3sl3',bk:0,hide:['mins','t3'],trailer:{sp:[190,630,131]},
+    text:'Lastebilen har tilhengerfeste 760 cm bak framakselen (se vognkortet). Slepvogna har 190 cm fra koplingspunktet til framakselen. Regn ut minsteavstanden og finn vogntogvekten i tabell 3a.',
+    goals:[{q:'Avstand fra bakerste aksel på lastebilen til tilhengerfestet?',unit:'m',tol:0.011,ans:(s,r)=>(s.truck.hitch-r.g.T.ax[r.g.T.ax.length-1])/100},
+      {q:'Minsteavstand?',unit:'m',tol:0.011,ans:(s,r)=>r.g.mins/100},
+      {q:'Største vogntogvekt etter tabell 3a på Bk10/50?',unit:'t',tol:0.05,ans:s=>t3Limit({...s,bk:0},geom(s).mins).kg/1000},
+      {q:'Hvor mye lenger må minsteavstanden bli for å få 50 tonn?',unit:'m',tol:0.011,ans:(s,r)=>Math.max(0,370-r.g.mins)/100}]},
+  {id:'c10',title:'Akselavstand 4-akslet bil',preset:'lb4bb',bk:0,hide:['t2'],
+    text:'For motorvogn med 4 aksler avhenger tillatt totalvekt i tabell 2 av avstanden fra første til siste aksel. Les akselavstandene i vognkortet og finn grensene.',
+    goals:[{q:'Avstand fra første til siste aksel?',unit:'m',tol:0.011,ans:s=>sum(s.truck.sp)/100},
+      {q:'Tillatt totalvekt etter tabell 2 på Bk10/50?',unit:'t',tol:0.05,ans:s=>t2Motor(s.truck,0).kg/1000},
+      {q:'Tillatt totalvekt etter tabell 2 på BkT8/50?',unit:'t',tol:0.05,ans:s=>t2Motor(s.truck,2).kg/1000}]}
+];
+// rekkefølge: plassering først, så fast svingskive, så regneoppgaver
+const CH_ORDER=['c1','c2','c3','c9','c4','c5','c6','c7','c8','c10'];
+CH.sort((a,b)=>CH_ORDER.indexOf(a.id)-CH_ORDER.indexOf(b.id));
+CH.forEach(c=>c.goals=c.goals.map(g=>Array.isArray(g)?{t:g[0],f:g[1]}:g));
+
+/* ---------- hjelpere ---------- */
+const $=s=>document.querySelector(s);
+const nb=(v,d=0)=>Number(v).toLocaleString('nb-NO',{minimumFractionDigits:d,maximumFractionDigits:d});
+const tS=kg=>nb(kg/1000,1);
+const kgS=kg=>nb(Math.round(kg))+' kg';
+const mS=cm=>nb(cm/100,2)+' m';
+const avg=a=>a.reduce((p,c)=>p+c,0)/a.length;
+const sum=a=>a.reduce((p,c)=>p+c,0);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const range=n=>Array.from({length:n},(_,i)=>i);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let uid=1;
+function mkItem([key,unit,x]){return {id:uid++,...TPL[key],unit,x};}
+
+/* ---------- tilstand ---------- */
+let state=null, selected=null, activeCh=null, quizAns={};
+const hidden=k=>{const c=CH.find(c=>c.id===activeCh);return !!(c&&c.hide&&c.hide.includes(k));};
+// Fast svingskive står der LTP blir for vognkortets aksellaster (Bk10)
+function fixFifth(){
+  const t=state.truck;if(t.kind!=='trekkbil'||t.fifthMove)return;
+  const T=geom(state).T,A=T.x2-T.x1,capF=t.allow[0]-t.tare[0],capR=t.allow[1]-t.tare[1];
+  const pay=Math.min(capF+capR,t.total-sum(t.tare),t.coupling||Infinity);
+  if(capF>0&&capR>0&&pay>0)t.fifth=Math.round(capF*A/pay);
+}
+let done={};
+try{done=JSON.parse(localStorage.getItem('aksellast-lab.done')||'{}')||{};}catch(e){done={};}
+
+function loadPreset(id,o={}){
+  const p=PRESETS[id];
+  state={preset:id,bk:o.bk??(state?state.bk:0),road:state?state.road:1950,
+    truck:{cfg:'tri',steer2:true,...clone(p.truck),...(o.truck||{})},trailer:p.trailer?{...clone(p.trailer),...(o.trailer||{})}:null,
+    items:(o.items??p.items).map(mkItem)};
+  selected=null;quizAns={};
+  fixFifth();
+  normalize();
+  $('#preset').value=id;
+  renderStatic();
+  render();
+}
+
+/* ---------- geometri ---------- */
+function mkGroup(name,idx,ax,driven){
+  return {name,idx,x:avg(idx.map(i=>ax[i])),gaps:idx.slice(1).map((i,k)=>ax[i]-ax[idx[k]]),driven};
+}
+function geom(s){
+  const t=s.truck,tr=s.trailer,fa=t.front;
+  const ax=[0];t.sp.forEach(d=>ax.push(ax[ax.length-1]+d));
+  const fi=t.n===4&&t.cfg==='bb'?[0,1]:[0],ri=range(t.n).slice(fi.length);
+  const groups=[mkGroup(fi.length>1?'Framaksler':'Framaksel',fi,ax,[]),mkGroup(ri.length===1?'Bakaksel':ri.length===2?'Bakboggi':'Trippelboggi',ri,ax,[0])];
+  const T={ax,groups,x1:groups[0].x,x2:groups[1].x,gx:fa};
+  T.fifthX=T.x2-t.fifth;
+  T.couplingX=t.kind==='trekkbil'?T.fifthX:t.hitch;
+  T.rearEnd=t.kind==='trekkbil'?t.rear:Math.max(t.deck[1],tr?t.hitch:0);
+  let R=null;
+  if(tr){
+    const a=[];let x=0;tr.sp.forEach(d=>{x+=d;a.push(x)});
+    if(tr.kind==='slepvogn'){
+      const f=tr.n>=4?2:1,fi=range(f),ri=range(tr.n).slice(f);
+      const gs=[mkGroup(f>1?'Framboggi':'Framaksel',fi,a,[]),mkGroup(ri.length>1?'Bakboggi':'Bakaksel',ri,a,[])];
+      R={ax:a,groups:gs,x1:gs[0].x,x2:gs[1].x};
+    }else{
+      const nm=tr.n===1?'Aksel':tr.n===2?(tr.sp[1]>179?'Aksler':'Boggi'):'Trippelboggi';
+      const gs=[mkGroup(nm,range(tr.n),a,[])];
+      R={ax:a,groups:gs,x1:0,x2:gs[0].x};
+    }
+    R.gx=fa+T.couplingX;
+  }
+  const decks=[];
+  if(t.kind==='lastebil')decks.push({unit:'truck',ref:fa,l0:t.deck[0],l1:t.deck[1],top:150});
+  if(tr)decks.push({unit:'trailer',ref:R.gx,l0:tr.deck[0],l1:tr.deck[1],top:tr.kind==='semi'?168:150});
+  const total=Math.max(fa+T.rearEnd,R?R.gx+tr.deck[1]:0);
+  const mins=R?R.gx+R.ax[0]-(fa+ax[ax.length-1]):null;
+  return {T,R,decks,total,mins};
+}
+
+/* ---------- beregning ---------- */
+function beam(loads,x1,x2){
+  const L=x2-x1;let F=0,M=0;
+  loads.forEach(l=>{F+=l.kg;M+=l.kg*(l.x-x1)});
+  const R2=M/L;return {F,M,R2,R1:F-R2,L};
+}
+function t1Limit(gr,motor,air,cls){
+  const n=gr.idx.length;
+  const single=i=>(gr.driven.includes(i)?T1.drive:T1.single)[cls];
+  const singles=sum(range(n).map(single));
+  if(n===1)return {kg:single(0)*1000,txt:`Tabell 1: ${gr.driven.includes(0)?'drivaksel':'aksel'}`};
+  if(n===2){
+    const d=gr.gaps[0]/100;
+    if(d>=1.80)return {kg:singles*1000,txt:'Tabell 1: to enkeltaksler (1,80 m eller mer)'};
+    const row=T1.boggi.find(b=>d>=b.min-1e-9);let v=row.v[cls],txt=`Tabell 1: boggi ${row.lbl}`;
+    if(cls===0&&d>=1.30&&motor&&air){v=19;txt+=', luftfjæring';}
+    return {kg:Math.min(v,singles)*1000,txt};
+  }
+  const ds=gr.gaps.map(g=>g/100);
+  const row=ds.some(d=>d<1.0)?T1.tri[2]:ds.some(d=>d<1.30)?T1.tri[1]:T1.tri[0];
+  return {kg:Math.min(row.v[cls],singles)*1000,txt:`Tabell 1: trippelboggi ${row.lbl}`};
+}
+function t2Motor(t,col){
+  if(t.n<4)return {kg:T2['motor'+t.n][col]*1000,txt:`Tabell 2: motorvogn med ${t.n} aksler`};
+  if(!(t.air&&t.steer2))return {kg:T2.motor3[col]*1000,txt:'Tabell 2: 4 aksler, men fotnote 1 er ikke oppfylt, så som 3 aksler'};
+  const span=sum(t.sp)/100,b=T2_4.filter(b=>span>=b[0]-1e-9).pop();
+  return {kg:b[1][col]*1000,txt:`Tabell 2: 4 aksler, ${nb(span,2)} m fra første til siste aksel`};
+}
+// 150/300-regelen for fast svingskive
+function rule150(s,r){
+  const t=s.truck,gr=r.g.T.groups,perT=t.n===2?300:150;
+  const rearBk=gr[1].row.lim,red=Math.max(0,Math.floor((t.allow[1]-rearBk)/1000+1e-9));
+  const frontBase=gr[0].row.lim,plan=frontBase-red*perT;
+  const A=r.g.T.x2-r.g.T.x1,d=t.fifth;
+  const K=d<A?(rearBk-t.tare[1])*A/(A-d):0,exact=t.tare[0]+K*d/A;
+  return {perT,rearV:t.allow[1],rearBk,red,frontBase,plan,exact,rearName:gr[1].name.toLowerCase()};
+}
+function t3Limit(s,mins){
+  const m=Math.min(s.truck.n,4),tr=s.trailer;let tab,key,desc;
+  if(tr.kind==='slepvogn'){tab=T3A;key=`${m}-${Math.min(tr.n,4)}`;desc=`Tabell 3a: motorvogn ${m} aksler + slepvogn ${tr.n} aksler`;}
+  else{
+    const row=tr.n===1?'1':tr.n===2?(tr.sp[1]>179?'2w':'2'):'3';
+    tab=T3B;key=`${m}-${row}`;
+    desc=`Tabell 3b: motorvogn ${m} aksler + ${tr.kind==='semi'?'semitrailer':'påhengsvogn'} ${row==='2w'?'2 aksler over 1,79 m':tr.n+(tr.n>1?' aksler':' aksel')}`;
+  }
+  const bands=tab[key],d=Math.round(mins)/100;let idx=0;
+  bands.forEach((b,i)=>{if(d>=b[0]-1e-9)idx=i});
+  const b=bands[idx],next=bands[idx+1];
+  const lbl=idx===0?'under 3,00 m':next?`${nb(b[0],2)}–${nb(next[0]-0.01,2)} m`:`${nb(b[0],2)} m og mer`;
+  return {kg:b[1][s.bk]*1000,txt:`${desc}, minsteavstand ${lbl}`};
+}
+function stat(val,lim,mode){
+  if(mode==='min')return val>=lim?'ok':'bad';
+  if(val<-0.5)return 'neg';
+  const q=val/lim;return q>1.0001?'bad':q>=0.95?'full':'ok';
+}
+
+function compute(s){
+  const g=geom(s),t=s.truck,tr=s.trailer,col=s.bk,cls=BK[col].cls,bkId=BK[col].id;
+  const r={g,rows:[],warns:[]};
+  const add=o=>{
+    if(o.sec){r.rows.push(o);return o;}
+    const lims=o.lims.filter(l=>l.kg>0);
+    const gov=o.mode==='min'?lims[0]:lims.reduce((a,b)=>b.kg<a.kg?b:a,lims[0]);
+    const row={...o,lims,gov,lim:gov?gov.kg:0};
+    row.st=gov?stat(o.val,gov.kg,o.mode):'ok';
+    row.q=gov&&o.mode!=='min'?o.val/gov.kg:1;
+    r.rows.push(row);return row;
+  };
+  const uT=t.kind==='lastebil'?'Lastebil':'Trekkbil';
+  const uR=tr?{semi:'Semitrailer',slepvogn:'Slepvogn',pahengsvogn:'Påhengsvogn'}[tr.kind]:'';
+  r.uT=uT;r.uR=uR;
+  // tilhenger først: den gir koplingslast til bilen
+  let K=0;
+  if(tr){
+    const items=s.items.filter(i=>i.unit==='trailer');
+    const b=beam(items,g.R.x1,g.R.x2);
+    r.R={items,b,loads:[b.R1+tr.tare[0],b.R2+tr.tare[1]]};
+    if(tr.kind!=='slepvogn')K=r.R.loads[0];
+  }
+  const items=t.kind==='lastebil'?s.items.filter(i=>i.unit==='truck'):[];
+  const pl=items.map(i=>({kg:i.kg,x:i.x}));
+  if(tr&&tr.kind!=='slepvogn')pl.push({kg:K,x:g.T.couplingX,coupling:true});
+  const b=beam(pl,g.T.x1,g.T.x2);
+  r.T={items,b,K,loads:[b.R1+t.tare[0],b.R2+t.tare[1]]};
+
+  add({sec:uT});
+  g.T.groups.forEach((gr,i)=>{
+    const L=t1Limit(gr,true,t.air,cls);
+    gr.row=add({label:gr.name,val:r.T.loads[i],lims:[{src:'Vognkort',kg:t.allow[i]},{src:bkId,kg:L.kg,txt:L.txt}]});
+  });
+  const tTot=sum(r.T.loads);
+  const L2=t2Motor(t,col);
+  r.tTotRow=add({key:'t2',label:'Totalvekt',val:tTot,lims:[{src:'Vognkort',kg:t.total},{src:bkId,kg:L2.kg,txt:L2.txt}]});
+  if(t.kind==='trekkbil'&&!t.fifthMove){
+    r.rule=rule150(s,r);
+    if(r.rule.red>0&&!hidden('rule'))r.warns.push(`Fast svingskive: på ${bkId} kan framakselen regnes med ca. ${kgS(r.rule.plan)} (${r.rule.perT}-regelen).`);
+  }
+  if(tTot>0&&r.T.loads[0]/tTot<0.2)r.warns.push(`Bare ${nb(r.T.loads[0]/tTot*100)} % av vekten på ${uT.toLowerCase()}en ligger på framakselen. Lite vekt på styreakselen gir dårlig styring og bremsing.`);
+  if(tr){
+    if(tr.kind==='semi')r.coupRow=add({label:'Svingskivelast',val:K,lims:[{src:'Vognkort trekkbil',kg:t.coupling,txt:'tillatt svingskivelast'},{src:'Vognkort semitrailer',kg:tr.allow[0],txt:'tillatt last på king-pin'}]});
+    if(tr.kind==='pahengsvogn')r.coupRow=add({label:'Koplingslast',val:K,lims:[{src:'Vognkort lastebil',kg:t.coupling,txt:'tillatt koplingslast'},{src:'Vognkort påhengsvogn',kg:tr.allow[0],txt:'tillatt koplingslast'}]});
+    if(r.coupRow&&r.coupRow.st==='neg')r.warns.push('Koplingslasten er negativ: tilhengeren løfter bakenden av bilen. Flytt lasten framover på tilhengeren.');
+    add({sec:uR});
+    if(tr.kind==='slepvogn'){
+      g.R.groups.forEach((gr,i)=>{
+        const L=t1Limit(gr,false,false,cls);
+        gr.row=add({label:gr.name,val:r.R.loads[i],lims:[{src:'Vognkort',kg:tr.allow[i]},{src:bkId,kg:L.kg,txt:L.txt}]});
+      });
+      r.rTotRow=add({label:'Totalvekt',val:sum(r.R.loads),lims:[{src:'Vognkort',kg:tr.total},{src:bkId,kg:T2['slep'+Math.min(tr.n,4)][col]*1000,txt:`Tabell 2: slepvogn med ${tr.n} aksler`}]});
+    }else{
+      const gr=g.R.groups[0],L=t1Limit(gr,false,false,cls);
+      gr.row=add({label:gr.name,val:r.R.loads[1],lims:[{src:'Vognkort',kg:tr.allow[1]},{src:bkId,kg:L.kg,txt:L.txt}]});
+      r.rTotRow=add({label:'Totalvekt inkl. koplingslast',val:sum(r.R.loads),lims:[{src:'Vognkort',kg:tr.total}]});
+      r.rAxRow=add({label:'Sum aksellast',val:r.R.loads[1],lims:[{src:bkId,kg:T2['semi'+Math.min(tr.n,3)][col]*1000,txt:`Tabell 2: ${tr.kind==='semi'?'semitrailer':'påhengsvogn'} med ${tr.n} aksl${tr.n>1?'er':'el'}`}]});
+    }
+    add({sec:'Vogntog'});
+    const trAx=tr.kind==='slepvogn'?sum(r.R.loads):r.R.loads[1];
+    r.train=tTot+trAx;
+    const L3=t3Limit(s,g.mins);r.L3=L3;
+    r.trainRow=add({key:'t3',label:'Vogntogvekt',val:r.train,lims:[{src:'Vognkort bil',kg:t.train,txt:'tillatt vogntogvekt'},{src:bkId,kg:L3.kg,txt:L3.txt}]});
+    add({key:'mins',label:'Minsteavstand',val:g.mins,unit:'m',mode:'min',lims:[{src:'Forskriften',kg:300,txt:'minst 3,00 m for N2/N3 med O3/O4'}]});
+  }else add({sec:'Lengde'});
+  const roadL=s.road;
+  const lenLim=!tr?1200:tr.kind==='semi'?Math.min(roadL,1750):roadL;
+  add({label:tr?'Vogntoglengde':'Lengde',val:g.total,unit:'m',lims:[{src:'Tabell 4',kg:lenLim,txt:!tr?'motorvogn: 12,00 m':tr.kind==='semi'?`motorvogn med semitrailer på ${nb(roadL/100,2)} m-veg`:`motorvogn med tilhenger på ${nb(roadL/100,2)} m-veg`}]});
+  r.cargo=sum(s.items.map(i=>i.kg));
+  r.bad=r.rows.filter(x=>x.st==='bad'||x.st==='neg').length;
+  r.ok=r.bad===0;
+  return r;
+}
+
+/* LTP: der lastens tyngdepunkt bør ligge (målt fra fremre støttepunkt) */
+function ltpFor(r,unit){
+  const s=state;
+  // tillatt nyttelast = minste av (nyttelast foran + bak) og (tillatt totalvekt − egenvekt)
+  const mk=(capF,capR,totCap,A,x2)=>{
+    if(capF<0||capR<=0)return null;
+    const pay=Math.max(1,Math.min(capF+capR,totCap)),fromRear=capF*A/pay;
+    return {fromRear,x:x2-fromRear,capF,capR,pay,totCap,A,byTotal:totCap<capF+capR};
+  };
+  if(unit==='truck'){
+    const t=s.truck,gr=r.g.T.groups;
+    return mk(gr[0].row.lim-t.tare[0],gr[1].row.lim-t.tare[1],r.tTotRow.lim-sum(t.tare),r.g.T.x2-r.g.T.x1,r.g.T.x2);
+  }
+  // tilhengeren får det som er igjen når bilen er fullt lastet
+  const p=loadPlan(r);
+  return mk(p.trl.capF,p.trl.capR,p.trl.totCap,r.g.R.x2-r.g.R.x1,r.g.R.x2);
+}
+// Hvor mye trekkbilen kan bære på svingskiva der den står nå (begge aksler og totalvekt innenfor)
+function truckCarry(r){
+  const t=state.truck,gr=r.g.T.groups,A=r.g.T.x2-r.g.T.x1,d=t.fifth;
+  let K=r.tTotRow.lim-sum(t.tare);
+  if(d>0)K=Math.min(K,(gr[0].row.lim-t.tare[0])*A/d);
+  if(d<A)K=Math.min(K,(gr[1].row.lim-t.tare[1])*A/(A-d));
+  return Math.max(0,K);
+}
+// Bilen lastes først med framakselen fullt utnyttet; tilhengeren får resten av vogntogvekten
+function loadPlan(r){
+  const s=state,t=s.truck,tr=s.trailer,R=r.g.R,tareT=sum(t.tare),tareR=sum(tr.tare),trainLim=r.trainRow.lim;
+  let bil,trl;
+  if(tr.kind==='semi'){
+    const carry=Math.min(truckCarry(r),r.coupRow.lim);
+    bil={name:'Trekkbil og semi foran',lim:tareT+carry,tare:tareT+tr.tare[0]};
+    const rearLim=Math.min(R.groups[0].row.lim,r.rAxRow.lim);
+    trl={name:'Semitrailer bak',lim:rearLim,tare:tr.tare[1]};
+    bil.pay=Math.max(0,bil.lim-bil.tare);trl.pay=Math.max(0,trl.lim-trl.tare);
+    trl.capF=bil.pay;trl.capR=trl.pay;
+    trl.totCap=Math.min(r.rTotRow.lim-tareR,trainLim-tareT-tareR);
+  }else{
+    const lt=ltpFor(r,'truck'),pay=lt?lt.pay:0;
+    bil={name:r.uT,lim:tareT+pay,tare:tareT,pay};
+    let capF,capR;
+    if(tr.kind==='slepvogn'){capF=R.groups[0].row.lim-tr.tare[0];capR=R.groups[1].row.lim-tr.tare[1];}
+    else{capF=r.coupRow.lim-tr.tare[0];capR=Math.min(R.groups[0].row.lim,r.rAxRow.lim)-tr.tare[1];}
+    const left=trainLim-bil.lim-tareR;
+    trl={name:r.uR,tare:tareR,capF,capR,left,totCap:Math.min(r.rTotRow.lim-tareR,left)};
+    trl.pay=Math.max(0,Math.min(capF+capR,trl.totCap));trl.lim=tareR+trl.pay;
+  }
+  const tog={name:'Vogntog',lim:trainLim,tare:tareT+tareR};
+  tog.pay=tr.kind==='semi'?Math.max(0,Math.min(bil.pay+trl.pay,trl.totCap)):bil.pay+trl.pay;
+  return {bil,trl,tog};
+}
+function fifthLtp(r){
+  const t=state.truck,gr=r.g.T.groups;
+  const capF=gr[0].row.lim-t.tare[0],capR=gr[1].row.lim-t.tare[1];
+  if(capF<0||capR<=0)return null;
+  let totCap=r.tTotRow.lim-sum(t.tare);
+  if(r.coupRow)totCap=Math.min(totCap,r.coupRow.lim);
+  const A=r.g.T.x2-r.g.T.x1,pay=Math.max(1,Math.min(capF+capR,totCap));
+  return {d:capF*A/pay,capF,capR,pay,totCap,A,byTotal:totCap<capF+capR};
+}
+// forklaring av hvilken nyttelast som gjelder
+function payTxt(l){
+  return l.byTotal
+    ?`Tillatt nyttelast er det minste av aksler (${kgS(l.capF)} + ${kgS(l.capR)} = ${kgS(l.capF+l.capR)}) og tillatt total- eller vogntogvekt minus egenvekt (${kgS(l.totCap)}): <b>${kgS(l.pay)}</b>.<br>`
+    :`Tillatt nyttelast: ${kgS(l.capF)} foran + ${kgS(l.capR)} bak = <b>${kgS(l.pay)}</b> (total- og vogntogvekt begrenser ikke).<br>`;
+}
+
+/* ---------- tegning ---------- */
+const svg=$('#stage');
+const TOP=-590,BOTTOM=455;
+// målsetting: linje med endestreker og tekst over (up) eller under
+function dim(xa,xb,y,txt,cls='',up=false){
+  const a=Math.min(xa,xb),b=Math.max(xa,xb);
+  return `<g class="${cls}"><path class="dim" d="M${a} ${y}H${b}M${a} ${y-12}V${y+12}M${b} ${y-12}V${y+12}"/><text class="dim-t" x="${(a+b)/2}" y="${up?y-14:y+32}">${txt}</text></g>`;
+}
+const segTxt=d=>d<160?nb(d/100,2):mS(d);
+function chain(xs,y){let o='';for(let i=1;i<xs.length;i++)o+=dim(xs[i-1],xs[i],y,segTxt(xs[i]-xs[i-1]));return o;}
+function stackItems(items){
+  const placed=[],out={};
+  items.forEach(it=>{
+    const a=it.x-it.len/2,b=it.x+it.len/2;let base=0;
+    placed.forEach(p=>{if(a<p.b-1&&b>p.a+1)base=Math.max(base,p.top)});
+    placed.push({a,b,top:base+it.h});out[it.id]=base;
+  });
+  return out;
+}
+function wheel(x){return `<circle class="tyre" cx="${x}" cy="-50" r="50"/><circle class="rim" cx="${x}" cy="-50" r="20"/>`;}
+function axleLabel(x,gr){
+  const row=gr.row;
+  return `<g class="al st-${row.st}"><title>${esc(gr.name)}: ${kgS(row.val)} av ${kgS(row.lim)}</title>
+    <path class="arrow" d="M${x} 80V12M${x-13} 27L${x} 10L${x+13} 27"/>
+    <text class="al-val" x="${x}" y="122">${tS(row.val)} t</text>
+    <text class="al-lim" x="${x}" y="153">maks ${tS(row.lim)}</text>
+    <text class="al-name" x="${x}" y="183">${esc(gr.name)}</text></g>`;
+}
+function drawStage(r){
+  const s=state,g=r.g,t=s.truck,tr=s.trailer,fa=t.front;
+  const X0=-60,X1=Math.max(g.total+70,1250);
+  svg.setAttribute('viewBox',`${X0} ${TOP} ${X1-X0} ${BOTTOM-TOP}`);
+  let o=`<line class="ground" x1="${X0}" x2="${X1}" y1="2" y2="2"/>`;
+  // bil
+  const cr=fa+95,rearG=fa+g.T.rearEnd;
+  o+=`<rect class="chassis" x="${fa-60}" y="-124" width="${rearG-fa+60}" height="26" rx="4"/>`;
+  o+=`<path class="cab" d="M0 -78V-250Q0 -330 62 -330H${cr}V-78Z"/><path class="glass" d="M16 -290Q20 -312 62 -312H${fa+5}V-212H16Z"/><rect class="chassis" x="-8" y="-98" width="46" height="30" rx="5"/>`;
+  if(t.kind==='lastebil'){
+    o+=`<rect class="deck" x="${fa+t.deck[0]}" y="-152" width="${t.deck[1]-t.deck[0]}" height="28" rx="3"/><rect class="deck" x="${fa+t.deck[0]}" y="-300" width="12" height="150"/>`;
+  }
+  if(t.kind==='trekkbil')o+=`<rect class="fifth" x="${fa+g.T.fifthX-55}" y="-140" width="110" height="18" rx="4"/>`;
+  if(tr&&tr.kind!=='semi')o+=`<rect class="chassis" x="${fa+t.hitch-30}" y="-100" width="30" height="30"/>`;
+  g.T.ax.forEach(a=>o+=wheel(fa+a));
+  // tilhenger
+  if(tr){
+    const ref=g.R.gx,d0=ref+tr.deck[0],d1=ref+tr.deck[1],a0=ref+g.R.ax[0],aN=ref+g.R.ax[g.R.ax.length-1];
+    if(tr.kind==='semi'){
+      o+=`<rect class="chassis" x="${ref+150}" y="-142" width="12" height="80"/><rect class="chassis" x="${ref-6}" y="-144" width="12" height="10"/>`;
+      o+=`<rect class="chassis" x="${a0-80}" y="-142" width="${aN-a0+160}" height="44" rx="4"/>`;
+      o+=`<rect class="deck" x="${d0}" y="-170" width="${d1-d0}" height="30" rx="3"/>`;
+    }else{
+      o+=`<path class="drawbar" d="M${ref} -85L${d0+40} -112"/>`;
+      o+=`<rect class="chassis" x="${d0+30}" y="-124" width="${d1-d0-60}" height="24" rx="4"/>`;
+      if(tr.kind==='slepvogn')o+=`<rect class="chassis" x="${ref+g.R.groups[0].x-90}" y="-124" width="180" height="22"/>`;
+      o+=`<rect class="deck" x="${d0}" y="-152" width="${d1-d0}" height="28" rx="3"/>`;
+    }
+    o+=`<circle class="hitch" cx="${ref}" cy="${tr.kind==='semi'?-131:-85}" r="11"/>`;
+    g.R.ax.forEach(a=>o+=wheel(ref+a));
+  }
+  // markører: TP og LTP
+  g.decks.forEach(d=>{
+    const its=s.items.filter(i=>i.unit===d.unit),R=d.unit==='truck'?r.T:r.R;
+    const lt=ltpFor(r,d.unit);
+    if(lt&&lt.x>d.l0-50&&lt.x<d.l1+50){
+      const x=d.ref+lt.x,xr=x+lt.fromRear,rN=(d.unit==='truck'?g.T.groups[1]:g.R.groups[g.R.groups.length-1]).name.toLowerCase();
+      o+=`<line class="mk-ltp" x1="${x}" x2="${x}" y1="-500" y2="${-d.top}"/><line class="dim dim-ltp" x1="${xr}" x2="${xr}" y1="-500" y2="${-d.top}" stroke-dasharray="6 8"/>`;
+      o+=dim(x,xr,-500,`LTP ${mS(lt.fromRear)} foran senter ${rN}`,'ltp-dim',true);
+    }
+    if(its.length){
+      const F=sum(its.map(i=>i.kg)),x=d.ref+sum(its.map(i=>i.kg*i.x))/F;
+      o+=`<line class="mk-cg" x1="${x}" x2="${x}" y1="-440" y2="${-d.top}"/><text class="mk-t cg" x="${x}" y="-450">TP</text>`;
+    }
+  });
+  if(t.kind==='trekkbil'){
+    const xf=fa+g.T.fifthX,xr=fa+g.T.x2;
+    o+=`<line class="dim" x1="${xr}" x2="${xr}" y1="-540" y2="-130" stroke-dasharray="6 8"/><line class="dim" x1="${xf}" x2="${xf}" y1="-540" y2="-140"/>`;
+    o+=dim(xf,xr,-540,`Svingskive ${mS(t.fifth)} foran senter ${g.T.groups[1].name.toLowerCase()}`,'',true);
+  }
+  // last
+  g.decks.forEach(d=>{
+    const its=s.items.filter(i=>i.unit===d.unit),base=stackItems(its);
+    its.forEach(it=>{
+      const x=d.ref+it.x-it.len/2,y=-(d.top+base[it.id]+it.h);
+      const rx=it.coil?Math.min(it.h,it.len)/2:6;
+      o+=`<g class="it${selected===it.id?' sel':''}" data-item="${it.id}"><title>${esc(it.name)}, ${kgS(it.kg)}</title>`;
+      o+=`<rect class="body it-${it.cat}" x="${x}" y="${y}" width="${it.len}" height="${it.h}" rx="${rx}"/>`;
+      if(it.cat==='pall')o+=`<rect class="it-base" x="${x}" y="${y+it.h-16}" width="${it.len}" height="16"/>`;
+      if(it.len>=90)o+=`<text x="${x+it.len/2}" y="${y+it.h/2+11}">${tS(it.kg)} t</text>`;
+      o+=`</g>`;
+    });
+  });
+  // aksellaster
+  g.T.groups.forEach(gr=>o+=axleLabel(fa+gr.x,gr));
+  if(tr)g.R.groups.forEach(gr=>o+=axleLabel(g.R.gx+gr.x,gr));
+  if(r.coupRow){
+    const x=g.R.gx,st=r.coupRow.st;
+    o+=`<g class="al st-${st}"><path class="arrow" d="M${x} 210V196"/><text class="al-val" x="${x}" y="243" style="font-size:30px">${tr.kind==='semi'?'Svingskive':'Kopling'} ${tS(r.coupRow.val)} t</text></g>`;
+  }
+  // akselavstander som i vognkortet
+  o+=chain(g.T.ax.map(a=>fa+a),285);
+  if(tr){
+    o+=chain([g.R.gx,...g.R.ax.map(a=>g.R.gx+a)],345);
+    const xa=fa+g.T.ax[g.T.ax.length-1],xb=g.R.gx+g.R.ax[0];
+    o+=dim(xa,xb,405,`Minsteavstand ${hidden('mins')?'?':mS(g.mins)}`);
+  }
+  svg.innerHTML=o;
+}
+
+/* ---------- dra og slipp ---------- */
+let drag=null;
+function svgPt(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse());}
+function placeItem(it,gxc){
+  const decks=geom(state).decks;if(!decks.length)return;
+  let best=null,bd=Infinity;
+  decks.forEach(d=>{
+    const a=d.ref+d.l0,b=d.ref+d.l1,dist=gxc<a?a-gxc:gxc>b?gxc-b:0;
+    if(dist<bd){bd=dist;best=d;}
+  });
+  const lo=best.l0+it.len/2,hi=best.l1-it.len/2;
+  it.unit=best.unit;
+  it.x=Math.round(lo>hi?(best.l0+best.l1)/2:clamp(gxc-best.ref,lo,hi));
+}
+function itemGX(it){const d=geom(state).decks.find(d=>d.unit===it.unit);return d?d.ref+it.x:0;}
+svg.addEventListener('pointerdown',e=>{
+  const el=e.target.closest('[data-item]');if(!el)return;
+  const it=state.items.find(i=>i.id===+el.dataset.item);if(!it)return;
+  const p=svgPt(e);drag={it,dx:p.x-itemGX(it),unit:it.unit};
+  selected=it.id;svg.setPointerCapture(e.pointerId);e.preventDefault();
+  highlightItems();render();
+});
+svg.addEventListener('pointermove',e=>{
+  if(!drag)return;const p=svgPt(e);placeItem(drag.it,p.x-drag.dx);render();
+});
+function endDrag(){if(!drag)return;const changed=drag.unit!==drag.it.unit;drag=null;if(changed)renderItems();render();}
+svg.addEventListener('pointerup',endDrag);svg.addEventListener('pointercancel',endDrag);
+
+/* ---------- normalisering etter endringer ---------- */
+function normalize(){
+  const g=geom(state);
+  state.items.forEach(it=>{
+    const d=g.decks.find(d=>d.unit===it.unit)||g.decks[0];
+    if(!d)return;it.unit=d.unit;placeItem(it,d.ref+it.x);
+  });
+}
+function freeSpot(len,unit){
+  const g=geom(state),d=g.decks.find(d=>d.unit===unit)||g.decks[g.decks.length-1];
+  const its=state.items.filter(i=>i.unit===d.unit);
+  for(let x=d.l0+len/2;x<=d.l1-len/2;x+=10){
+    if(!its.some(i=>Math.abs(i.x-x)<(i.len+len)/2-1))return {unit:d.unit,x};
+  }
+  return {unit:d.unit,x:d.l0+len/2};
+}
+
+/* ---------- utdata ---------- */
+function render(){
+  const r=compute(state);
+  drawStage(r);renderStatus(r);renderResults(r);renderLtp(r);renderSteps(r);updateChallenge(r);updateRule(r);updateItemPos();
+}
+function renderStatus(r){
+  const s=state,bk=BK[s.bk].id;
+  const tot=s.trailer?r.train:sum(r.T.loads);
+  const pill=r.ok?`<span class="pill ok"><span class="dot"></span>Lovlig lastet for ${bk}</span>`
+    :`<span class="pill bad"><span class="dot"></span>${r.bad} ${r.bad===1?'grense':'grenser'} overskredet</span>`;
+  $('#statusRow').innerHTML=pill+
+    `<span class="kpi">${s.trailer?'Vogntogvekt':'Totalvekt'} <b>${tS(tot)} t</b></span><span class="kpi">Last <b>${tS(r.cargo)} t</b></span><span class="kpi">Lengde <b>${mS(r.g.total)}</b></span>`;
+}
+function renderResults(r){
+  let h='<thead><tr><th>Hva</th><th style="text-align:right">Faktisk</th><th>Grense</th><th>Utnyttelse</th></tr></thead><tbody>';
+  r.rows.forEach(row=>{
+    if(row.sec){h+=`<tr class="sec"><th colspan="4">${esc(row.sec)}</th></tr>`;return;}
+    const m=row.unit==='m',fmt=v=>m?mS(v):kgS(v);
+    if(hidden(row.key)){
+      h+=`<tr><td>${esc(row.label)}</td><td class="num v">${row.key==='mins'?'?':fmt(row.val)}</td><td><div class="lims"><span>Skjult under oppgaven</span></div></td><td></td></tr>`;return;
+    }
+    const lims=row.lims.map(l=>`<span class="${l===row.gov?'gov':''}">${fmt(l.kg)} · ${esc(vlName(l))}${l.txt?` (${esc(l.txt)})`:''}</span>`).join('');
+    let util='';
+    if(row.mode==='min')util=`<div class="pct">${row.st==='ok'?'OK':'For kort'}</div>`;
+    else{const q=row.q,w=clamp(q,0,1)*100;util=`<div class="bar"><b style="width:${w}%"></b></div><div class="pct">${row.st==='neg'?'løfter':nb(q*100)+' %'}</div>`;}
+    h+=`<tr class="${row.st}"><td>${esc(row.label)}</td><td class="num v">${fmt(row.val)}</td><td><div class="lims">${lims}</div></td><td>${util}</td></tr>`;
+  });
+  $('#res').innerHTML=h+'</tbody>';
+  $('#warns').innerHTML=r.warns.map(w=>`<li>${esc(w)}</li>`).join('');
+}
+
+function renderSteps(r){
+  const s=state,t=s.truck,tr=s.trailer,g=r.g;let h='';
+  const moms=(items,x1)=>`<ul class="calc">${items.map(i=>`<li>${esc(i.name)}: ${kgS(i.kg)} × ${mS(i.x-x1)} = ${nb(i.kg*(i.x-x1)/100)} kgm</li>`).join('')}</ul>`;
+  if(tr){
+    const R=r.R,b=R.b,ref=tr.kind==='semi'?'king-pin':tr.kind==='pahengsvogn'?'koplingspunktet':'senter framaksel';
+    const fN=tr.kind==='slepvogn'?g.R.groups[0].name.toLowerCase():tr.kind==='semi'?'king-pin':'koplingen';
+    const rN=(tr.kind==='slepvogn'?g.R.groups[1]:g.R.groups[0]).name.toLowerCase();
+    const p=loadPlan(r),cols=[p.bil,p.trl,p.tog];
+    h+=`<h4>Lasteplan: bilen lastes først</h4><p class="hint">${tr.kind==='semi'
+      ?'Trekkbilen lastes til framakselen er fullt utnyttet. Semitraileren bak får resten, så langt vogntogvekten tillater.'
+      :'Bilen lastes fullt etter sin LTP. Tilhengeren får det som er igjen av vogntogvekten.'}</p>
+      <div class="tbl-wrap"><table class="res"><thead><tr><th></th>${cols.map(c=>`<th style="text-align:right">${esc(c.name)}</th>`).join('')}</tr></thead><tbody>
+      <tr><td>Tillatt</td>${cols.map(c=>`<td class="num">${kgS(c.lim)}</td>`).join('')}</tr>
+      <tr><td>− Egenvekt</td>${cols.map(c=>`<td class="num">${kgS(c.tare)}</td>`).join('')}</tr>
+      <tr><td>= Nyttelast</td>${cols.map(c=>`<td class="num"><b>${kgS(c.pay)}</b></td>`).join('')}</tr></tbody></table></div>
+      ${tr.kind==='semi'?`<p class="hint">Svingskivelast = nyttelast foran + semitrailerens egenvekt foran = ${kgS(p.bil.pay)} + ${kgS(tr.tare[0])} = ${kgS(p.bil.pay+tr.tare[0])}.</p>`:''}
+      ${tr.kind==='pahengsvogn'?'<p class="hint">Koplingslasten fra påhengsvogna er ikke tatt med i planen.</p>':''}`;
+    h+=`<h4>1. ${r.uR}</h4><ol>`;
+    if(R.items.length){
+      h+=`<li>Regn moment for hvert kolli om ${ref}: vekt × avstand.${moms(R.items,g.R.x1)}Sum last <b>${kgS(b.F)}</b>, sum moment <b>${nb(b.M/100)} kgm</b>. Lastens tyngdepunkt ligger ${mS(b.M/b.F)} bak ${ref}.</li>`;
+      h+=`<li>${cap(rN)} får moment ÷ avstand (${mS(b.L)}): ${nb(b.M/100)} ÷ ${nb(b.L/100,2)} = <b>${kgS(b.R2)}</b></li>`;
+      h+=`<li>${cap(fN)} får resten: ${kgS(b.F)} − ${kgS(b.R2)} = <b>${kgS(b.R1)}</b></li>`;
+    }else h+='<li>Ingen last på tilhengeren.</li>';
+    h+=`<li>Legg til egenvekt: ${fN} ${kgS(tr.tare[0])} + ${kgS(b.R1)} = <b>${kgS(R.loads[0])}</b>, ${rN} ${kgS(tr.tare[1])} + ${kgS(b.R2)} = <b>${kgS(R.loads[1])}</b>.</li>`;
+    const lt=ltpFor(r,'trailer');
+    if(lt)h+=`<li>LTP for tilhengeren: nyttelast foran × avstand ÷ tillatt nyttelast<br>${payTxt(lt)}<span class="formula">${nb(lt.capF)} × ${nb(lt.A/100,2)} ÷ ${nb(lt.pay)} = ${mS(lt.fromRear)}</span> foran senter ${rN}.</li>`;
+    h+='</ol>';
+  }
+  const T=r.T,b=T.b,A=g.T.x2-g.T.x1,fN=g.T.groups[0].name.toLowerCase();
+  h+=`<h4>${tr?'2. ':''}${r.uT}</h4><ol>`;
+  if(t.kind==='trekkbil'){
+    const d=t.fifth;
+    h+=`<li>Svingskivelasten (${kgS(T.K)}) står ${mS(d)} foran senter ${g.T.groups[1].name.toLowerCase()}. Avstand ${fN} til senter bak: ${mS(A)}.</li>`;
+    h+=`<li>${cap(fN)} får svingskivelast × ${nb(d/100,2)} ÷ ${nb(A/100,2)} = <b>${kgS(b.R1)}</b></li>`;
+    h+=`<li>${g.T.groups[1].name} får resten: ${kgS(T.K)} − ${kgS(b.R1)} = <b>${kgS(b.R2)}</b></li>`;
+  }else{
+    const its=T.items.map(i=>({...i}));
+    if(T.K&&tr)its.push({name:'Koplingslast fra påhengsvogn',kg:T.K,x:g.T.couplingX});
+    if(its.length){
+      h+=`<li>Regn moment om senter ${fN}.${moms(its,g.T.x1)}Sum <b>${kgS(b.F)}</b> og <b>${nb(b.M/100)} kgm</b>.${T.items.length?` Lastens tyngdepunkt ligger ${mS(sum(T.items.map(i=>i.kg*i.x))/sum(T.items.map(i=>i.kg)))} bak framakselen.`:''}</li>`;
+      h+=`<li>${g.T.groups[1].name} får moment ÷ akselavstand (${mS(A)}): <b>${kgS(b.R2)}</b></li>`;
+      h+=`<li>${cap(fN)} får resten: ${kgS(b.F)} − ${kgS(b.R2)} = <b>${kgS(b.R1)}</b>${b.R1<0?' (negativt: lasten løfter fronten)':''}</li>`;
+    }else h+='<li>Ingen last på bilen.</li>';
+  }
+  h+=`<li>Legg til egenvekt: ${fN} ${kgS(t.tare[0])} + ${kgS(b.R1)} = <b>${kgS(T.loads[0])}</b>, ${g.T.groups[1].name.toLowerCase()} ${kgS(t.tare[1])} + ${kgS(b.R2)} = <b>${kgS(T.loads[1])}</b>.</li>`;
+  if(t.kind==='trekkbil'){
+    const f=fifthLtp(r);
+    if(f&&t.fifthMove)h+=`<li>Beste plassering av svingskiva (LTP): nyttelast foran × akselavstand ÷ tillatt nyttelast<br>${payTxt(f)}<span class="formula">${nb(f.capF)} × ${nb(f.A/100,2)} ÷ ${nb(f.pay)} = ${mS(f.d)}</span> foran senter bak. Nå står den ${mS(t.fifth)} foran.</li>`;
+    if(!t.fifthMove)h+=`<li>Svingskiva er fastmontert ${mS(t.fifth)} foran senter bak (LTP etter vognkortet, for Bk10). Se 150/300-regelen under bildet.</li>`;
+  }else{
+    const lt=ltpFor(r,'truck');
+    if(lt)h+=`<li>LTP: nyttelast foran × akselavstand ÷ tillatt nyttelast<br>${payTxt(lt)}<span class="formula">${nb(lt.capF)} × ${nb(lt.A/100,2)} ÷ ${nb(lt.pay)} = ${mS(lt.fromRear)}</span> foran senter ${g.T.groups[1].name.toLowerCase()}.${tr&&tr.kind==='pahengsvogn'?' Koplingslasten fra påhengsvogna kommer i tillegg.':''}</li>`;
+  }
+  h+='</ol>';
+  if(tr&&hidden('mins'))h+='<h4>3. Vogntog</h4><p class="hint">Skjult mens du løser oppgaven.</p>';
+  else if(tr){
+    h+=`<h4>3. Vogntog</h4><ol><li>Vogntogvekt = alle aksellaster lagt sammen = <b>${kgS(r.train)}</b>.</li>`;
+    h+=`<li>Minsteavstand (bakerste aksel på bilen til fremste aksel på tilhengeren) = <b>${mS(g.mins)}</b>.</li>`;
+    h+=`<li>${esc(r.L3.txt)} gir <b>${tS(r.L3.kg)} t</b> for ${BK[s.bk].id}. Vognkortet tillater ${tS(t.train)} t. Laveste verdi gjelder.</li></ol>`;
+  }
+  $('#steps').innerHTML=h;
+}
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+
+/* ---------- LTP-formelen med fargekodede tall ---------- */
+const vkTag='<span class="tag vk">Vognkort</span>',planTag='<span class="tag">Lasteplan</span>';
+// kildemerke for grensen som gjelder i en kontrollrad
+// vegliste = bruksklassen (Bk) for vegen, med tabellen grensen er hentet fra
+const isVL=l=>BK.some(b=>b.id===l.src);
+const vlName=l=>isVL(l)?'Vegliste '+l.src:l.src;
+const srcName=l=>isVL(l)&&(l.txt||'').includes(':')?`${vlName(l)} · ${l.txt.split(':')[0]}`:vlName(l);
+// kildemerke for grensen som gjelder, og hva den andre kilden sier
+function srcTag(row){
+  const g=row&&row.gov;if(!g)return '';
+  let h=`<span class="tag ${isVL(g)?'vl':'vk'}" title="${esc(g.txt||'')}">${esc(srcName(g))}</span>`;
+  if(row.lims.length>1)h+=` <span class="cmp">(${row.lims.map(l=>`${esc(srcName(l))}: ${kgS(l.kg)}`).join(', ')}. Laveste gjelder.)</span>`;
+  return h;
+}
+const minRow=(a,b)=>!b||a.lim<=b.lim?a:b;
+function ltpCard(c){
+  const l=c.l,q='?';
+  if(!l)return `<div class="ltp-card"><h3>${c.title}</h3><p class="hint">Kan ikke regnes: framakselen har ikke plass til nyttelast når egenvekten er trukket fra.</p></div>`;
+  const kv=(k,lbl,v)=>`<span class="kv ${k}"><small>${lbl}</small><b>${v}</b></span>`;
+  const gov=Math.min(...c.p.map(o=>o.v));
+  return `<div class="ltp-card"><h3>${c.title}</h3>
+    <div class="ltp-eq"><span class="op lt">LTP =</span><span class="frac"><span class="fn">${kv('k-f','nyttelast foran',kgS(l.capF))}<span class="op">×</span>${kv('k-a','akselavstand',mS(l.A))}</span><span class="fd">${kv('k-p','tillatt nyttelast',c.mask?q:kgS(l.pay))}</span></span><span class="op">=</span>${kv('k-r','LTP',c.mask?q:mS(c.res))}</div>
+    <p class="ltp-where">${c.mask?'':`${mS(c.res)} `}foran senter ${c.where}.${c.note?' '+c.note:''}</p>
+    <ul class="ltp-src">
+      <li class="k-f"><span class="h">Nyttelast foran</span>${c.f}</li>
+      <li class="k-a"><span class="h">Akselavstand</span>${c.a}</li>
+      <li class="k-p"><span class="h">Tillatt nyttelast: det minste av</span><ul>${c.p.map(o=>`<li class="${!c.mask&&o.v===gov?'gov':'alt'}">${!c.mask&&o.v===gov?'▸ ':''}${o.h}</li>`).join('')}</ul></li>
+    </ul></div>`;
+}
+const spTxt=(sp,from,to,A)=>`Akselavstander ${vkTag} ${sp.map(d=>nb(d/100,2)).join(' / ')} m. Fra ${from} til senter ${to}: <b>${mS(A)}</b>`;
+function renderLtp(r){
+  const s=state,t=s.truck,tr=s.trailer,g=r.g,gr=g.T.groups,cards=[];
+  const fN=gr[0].name.toLowerCase(),rN=gr[1].name.toLowerCase(),tareT=sum(t.tare);
+  const front=(row,tare,lbl)=>`Tillatt ${lbl} ${kgS(row.lim)} ${srcTag(row)} − egenvekt foran ${kgS(tare)} ${vkTag} = <b>${kgS(row.lim-tare)}</b>`;
+  const axOpt=(capF,row,tare,rLbl)=>({v:capF+row.lim-tare,h:`Akslene: ${kgS(capF)} foran + ${rLbl} (${kgS(row.lim)} ${srcTag(row)} − egenvekt ${kgS(tare)} ${vkTag}) = <b>${kgS(capF+row.lim-tare)}</b>`});
+  if(tr){
+    const lt=ltpFor(r,'trailer'),p=loadPlan(r),R=g.R,tareR=sum(tr.tare),mask=hidden('t3')||hidden('mins');
+    const to=(tr.kind==='slepvogn'?R.groups[1]:R.groups[0]).name.toLowerCase();
+    const trainOpt=row=>mask?`Vogntogvekt: <b>?</b> (skjult mens du løser oppgaven)`:row;
+    const c={title:`${r.uR}`,l:lt,res:lt&&lt.fromRear,where:to,mask};
+    if(lt){
+      if(tr.kind==='semi'){
+        const rear=minRow(R.groups[0].row,r.rAxRow);
+        c.f=`Fra lasteplanen ${planTag}: trekkbil og semi foran tillatt ${kgS(p.bil.lim)} − egenvekt trekkbil og semi foran ${kgS(p.bil.tare)} = <b>${kgS(lt.capF)}</b>. Trekkbilen lastes først, med framakselen fullt utnyttet.`;
+        c.a=spTxt(tr.sp,'king-pin',to,lt.A);
+        c.p=[axOpt(lt.capF,rear,tr.tare[1],'semitrailer bak'),
+          {v:r.rTotRow.lim-tareR,h:`Totalvekt semitrailer: ${kgS(r.rTotRow.lim)} ${srcTag(r.rTotRow)} − egenvekt ${kgS(tareR)} ${vkTag} = <b>${kgS(r.rTotRow.lim-tareR)}</b>`},
+          {v:r.trainRow.lim-tareT-tareR,h:trainOpt(`Vogntogvekt: ${kgS(r.trainRow.lim)} ${srcTag(r.trainRow)} − egenvekt bil og semi ${kgS(tareT+tareR)} ${vkTag} = <b>${kgS(r.trainRow.lim-tareT-tareR)}</b>`)}];
+      }else{
+        const sl=tr.kind==='slepvogn';
+        c.f=sl?front(R.groups[0].row,tr.tare[0],R.groups[0].name.toLowerCase())
+          :`Tillatt koplingslast ${kgS(r.coupRow.lim)} ${srcTag(r.coupRow)} − egenvekt på koplingen ${kgS(tr.tare[0])} ${vkTag} = <b>${kgS(lt.capF)}</b>`;
+        c.a=spTxt(tr.sp,sl?'senter '+R.groups[0].name.toLowerCase():'koplingspunktet',to,lt.A);
+        const rear=sl?R.groups[1].row:minRow(R.groups[0].row,r.rAxRow);
+        c.p=[axOpt(lt.capF,rear,tr.tare[1],'bak'),
+          {v:r.rTotRow.lim-tareR,h:`Totalvekt ${r.uR.toLowerCase()}: ${kgS(r.rTotRow.lim)} ${srcTag(r.rTotRow)} − egenvekt ${kgS(tareR)} ${vkTag} = <b>${kgS(r.rTotRow.lim-tareR)}</b>`},
+          {v:p.trl.left,h:trainOpt(`Det som er igjen av vogntogvekten: ${kgS(r.trainRow.lim)} ${srcTag(r.trainRow)} − bilen fullt lastet ${kgS(p.bil.lim)} ${planTag} − egenvekt ${kgS(tareR)} ${vkTag} = <b>${kgS(p.trl.left)}</b>`)}];
+      }
+    }
+    cards.push(c);
+  }
+  const mask=hidden('t2'),totOpt=(ex=[])=>({v:r.tTotRow.lim-tareT,h:mask?'Totalvekt: <b>?</b> (finn den i Tabell 2)':`Totalvekt: ${kgS(r.tTotRow.lim)} ${srcTag(r.tTotRow)} − egenvekt ${kgS(tareT)} ${vkTag} = <b>${kgS(r.tTotRow.lim-tareT)}</b>`});
+  const A=g.T.x2-g.T.x1,a=spTxt(t.sp,'senter '+fN,rN,A),f=front(gr[0].row,t.tare[0],fN);
+  if(t.kind==='trekkbil'){
+    const l=fifthLtp(r),c={title:'Trekkbil: beste plass for svingskiva',l,res:l&&l.d,where:rN,mask,a,f};
+    c.note=t.fifthMove?`Nå står den ${mS(t.fifth)} foran.`:`Svingskiva er fast og står ${mS(t.fifth)} foran. Se 150/300-regelen.`;
+    if(l){
+      c.p=[axOpt(l.capF,gr[1].row,t.tare[1],'bak'),totOpt()];
+      if(r.coupRow)c.p.push({v:r.coupRow.lim,h:`Svingskivelast: <b>${kgS(r.coupRow.lim)}</b> ${srcTag(r.coupRow)}`});
+    }
+    cards.unshift(c);
+  }else{
+    const l=ltpFor(r,'truck'),c={title:r.uT,l,res:l&&l.fromRear,where:rN,mask,a,f};
+    if(l)c.p=[axOpt(l.capF,gr[1].row,t.tare[1],'bak'),totOpt()];
+    if(tr&&tr.kind==='pahengsvogn')c.note='Koplingslasten fra påhengsvogna kommer i tillegg.';
+    cards.unshift(c);
+  }
+  $('#ltpBox').innerHTML=cards.map(ltpCard).join('');
+}
+
+/* ---------- statiske deler: velgere, vognkort, last ---------- */
+function renderStatic(){
+  $('#bk').innerHTML=BK.map((b,i)=>`<button type="button" data-bk="${i}" aria-pressed="${state.bk===i}">${b.id}</button>`).join('');
+  $('#road').value=String(state.road);
+  renderFifth();renderAdd();renderVK();renderItems();renderChList();
+}
+function renderFifth(){
+  const t=state.truck,el=$('#fifthCtl');
+  if(t.kind!=='trekkbil'){el.innerHTML='';return;}
+  el.innerHTML=`<div class="fifth-ctl">
+    <label class="field" style="flex:1 1 260px"><span class="label">Svingskive: <span id="fifthVal">${mS(t.fifth)}</span> foran senter bakaksel</span>
+      <input id="fifth" type="range" min="${t.fifthRange[0]}" max="${t.fifthRange[1]}" step="1" value="${t.fifth}" ${t.fifthMove?'':'disabled'}></label>
+    <label class="chk"><input id="fifthMove" type="checkbox" ${t.fifthMove?'checked':''}> Flyttbar svingskive</label>
+    <button class="btn ghost" id="fifthLtp" type="button" ${t.fifthMove?'':'disabled'}>Sett på LTP</button>
+    <div id="ruleBox" style="flex:1 1 100%"></div></div>`;
+  $('#fifth').addEventListener('input',e=>{t.fifth=+e.target.value;$('#fifthVal').textContent=mS(t.fifth);normalize();render();});
+  $('#fifthMove').addEventListener('change',e=>{t.fifthMove=e.target.checked;fixFifth();renderFifth();normalize();render();});
+  $('#fifthLtp').addEventListener('click',()=>{const f=fifthLtp(compute(state));if(!f)return;t.fifth=Math.round(clamp(f.d,t.fifthRange[0],t.fifthRange[1]));renderFifth();normalize();render();});
+}
+function updateRule(r){
+  const el=$('#ruleBox');if(!el)return;
+  const t=state.truck;
+  if(t.fifthMove||!r.rule){el.innerHTML='';return;}
+  const u=r.rule,bk=BK[state.bk].id,n=t.n===2?'to':'tre';
+  const rule=`<p>For trekkbil med fast svingskive gjelder en tommelfingerregel: <b>300 kg</b> mindre på framakselen for hvert hele tonn bakakselen reduseres (to aksler), <b>150 kg</b> per tonn boggilast (tre aksler eller flere).</p>`;
+  if(hidden('rule')){el.innerHTML=`<div class="rule"><b>Fast svingskive: 150/300-regelen</b>${rule}<p class="hint">Regn ut svaret selv. Utregningen vises når oppgaven er avsluttet.</p></div>`;return;}
+  el.innerHTML=`<div class="rule"><b>Fast svingskive: 150/300-regelen</b>${rule}<ol>
+    <li>${cap(u.rearName)} etter vognkortet: ${kgS(u.rearV)}. Tillatt på ${bk}: ${kgS(u.rearBk)}.</li>
+    <li>Reduksjon: ${nb((u.rearV-u.rearBk)/1000,1)} t, altså <b>${u.red}</b> hele tonn.</li>
+    <li>Trekkbil med ${n} aksler: ${u.red} × ${u.perT} kg = <b>${kgS(u.red*u.perT)}</b> mindre på framakselen.</li>
+    <li>Framakselen kan regnes med ${kgS(u.frontBase)} − ${kgS(u.red*u.perT)} = <b>${kgS(u.plan)}</b>.</li></ol>
+    <p class="hint">Kontroll med denne bilens mål: når ${u.rearName} er fullt lastet (${kgS(u.rearBk)}), får framakselen ${kgS(u.exact)}.</p></div>`;
+}
+function renderAdd(){
+  const el=$('#addRow');
+  if(!geom(state).decks.length){el.innerHTML='';return;}
+  el.innerHTML=`<span class="label">Legg til</span>`+
+    Object.entries(TPL).map(([k,t])=>`<button type="button" class="chip" data-add="${k}"><span class="sw it-sw-${t.cat}" style="background:var(--c-${t.cat})"></span>${t.name} ${nb(t.kg)} kg</button>`).join('')+
+    `<span class="custom"><input id="cKg" type="number" min="50" step="50" value="2000" aria-label="Vekt i kg"><span>kg</span><input id="cLen" type="number" min="20" step="10" value="200" aria-label="Lengde i cm"><span>cm</span><button type="button" class="btn ghost" id="cAdd">Legg til egen last</button></span>`;
+}
+$('#addRow').addEventListener('click',e=>{
+  const b=e.target.closest('[data-add]');
+  let it=null;
+  if(b)it={...TPL[b.dataset.add]};
+  else if(e.target.id==='cAdd'){
+    const kg=+$('#cKg').value,len=+$('#cLen').value;if(!(kg>0&&len>0))return;
+    it={name:'Egen last',kg,len,h:100,cat:'egen'};
+  }
+  if(!it)return;
+  const pref=state.items.length?state.items[state.items.length-1].unit:(state.truck.kind==='lastebil'?'truck':'trailer');
+  const sp=freeSpot(it.len,pref);
+  const n={id:uid++,...it,...sp};state.items.push(n);selected=n.id;
+  normalize();renderItems();render();
+});
+
+function renderItems(){
+  const s=state,el=$('#items');
+  if(!s.items.length){el.innerHTML='<p class="empty">Ingen last. Bruk knappene under bildet for å legge til.</p>';return;}
+  const both=s.truck.kind==='lastebil'&&s.trailer;
+  el.innerHTML=s.items.map(it=>`<div class="item-row${selected===it.id?' sel':''}" data-id="${it.id}">
+    <span class="sw" style="background:var(--c-${it.cat})"></span>
+    <div><div class="nm">${esc(it.name)}</div><div class="pos" data-pos></div></div>
+    <div style="display:flex;gap:4px"><button class="icon-btn" data-mv="-10" aria-label="Flytt 10 cm fram">◀</button><button class="icon-btn" data-mv="10" aria-label="Flytt 10 cm bak">▶</button><button class="icon-btn" data-del aria-label="Fjern">✕</button></div>
+    <div class="ed"><label>Vekt <input type="number" min="0" step="50" data-f="kg" value="${it.kg}"> kg</label><label>Lengde <input type="number" min="20" step="10" data-f="len" value="${it.len}"> cm</label>
+    ${both?`<label>På <select data-f="unit"><option value="truck"${it.unit==='truck'?' selected':''}>lastebil</option><option value="trailer"${it.unit==='trailer'?' selected':''}>tilhenger</option></select></label>`:''}</div></div>`).join('');
+}
+function updateItemPos(){
+  const s=state,ref={truck:'framaksel',trailer:s.trailer?(s.trailer.kind==='semi'?'king-pin':'koplingspunkt'):''};
+  document.querySelectorAll('#items .item-row').forEach(row=>{
+    const it=s.items.find(i=>i.id===+row.dataset.id);if(!it)return;
+    row.querySelector('[data-pos]').textContent=`${kgS(it.kg)} · midt ${mS(Math.abs(it.x))} ${it.x<0?'foran':'bak'} ${ref[it.unit]}`;
+  });
+  $('#cargoSum').textContent=`${s.items.length} kolli · ${kgS(sum(s.items.map(i=>i.kg)))}`;
+}
+function highlightItems(){document.querySelectorAll('#items .item-row').forEach(r=>r.classList.toggle('sel',+r.dataset.id===selected));}
+$('#items').addEventListener('click',e=>{
+  const row=e.target.closest('.item-row');if(!row)return;
+  const it=state.items.find(i=>i.id===+row.dataset.id);
+  if(e.target.closest('[data-del]')){state.items=state.items.filter(i=>i!==it);renderItems();render();return;}
+  const mv=e.target.closest('[data-mv]');
+  if(mv){placeItem(it,itemGX(it)+(+mv.dataset.mv));}
+  selected=it.id;highlightItems();render();
+});
+$('#items').addEventListener('change',e=>{
+  const f=e.target.dataset.f;if(!f)return;
+  const it=state.items.find(i=>i.id===+e.target.closest('.item-row').dataset.id);
+  if(f==='unit'){Object.assign(it,freeSpot(it.len,e.target.value));}
+  else{const v=+e.target.value;if(!(v>0))return;it[f]=v;}
+  normalize();updateItemPos();render();
+});
+
+/* vognkort-skjema */
+function vkFields(){
+  const t=state.truck,tr=state.trailer,lb=t.kind==='lastebil';
+  const uT=lb?'Lastebil':'Trekkbil';
+  const gN=geom(state).T.groups.map(g=>g.name.toLowerCase());
+  const truck={title:`${uT}`,obj:'truck',fields:[
+    {k:'n',l:'Antall aksler',type:'sel',opts:[2,3,4]},
+    ...(t.n===4?[{k:'cfg',l:'Akseloppsett',type:'cfg',opts:[['tri','1 foran, trippelboggi bak'],['bb','Boggi foran og bak']]}]:[]),
+    {k:'sp',l:'Akselavstander (cm), forfra',type:'list'},
+    {k:'tare.0',l:`Egenvekt ${gN[0]} (kg)`},{k:'tare.1',l:`Egenvekt ${gN[1]} (kg)`},
+    {k:'allow.0',l:`Tillatt last ${gN[0]} (kg)`},{k:'allow.1',l:`Tillatt last ${gN[1]} (kg)`},
+    {k:'total',l:'Tillatt totalvekt (kg)'},
+    ...(tr?[{k:'train',l:'Tillatt vogntogvekt (kg)'}]:[]),
+    ...(t.kind==='trekkbil'?[{k:'coupling',l:'Tillatt svingskivelast (kg)'},{k:'rear',l:'Bakerste punkt (cm bak framaksel)'}]:[]),
+    ...(tr&&tr.kind==='pahengsvogn'?[{k:'coupling',l:'Tillatt koplingslast (kg)'}]:[]),
+    ...(lb?[{k:'deck.0',l:'Lasteplan fra (cm bak framaksel)'},{k:'deck.1',l:'Lasteplan til (cm bak framaksel)'}]:[]),
+    ...(lb&&tr?[{k:'hitch',l:'Tilhengerfeste (cm bak framaksel)'}]:[]),
+    {k:'air',l:'Luftfjæring og tvillinghjul på drivaksel',type:'chk'},
+    ...(t.n===4?[{k:'steer2',l:'To styrende aksler (den ene kan være friksjonsstyrt)',type:'chk'}]:[])
+  ]};
+  if(!tr)return [truck];
+  const semi=tr.kind==='semi',slep=tr.kind==='slepvogn',refN=semi?'king-pin':'koplingspunkt';
+  const uR={semi:'Semitrailer',slepvogn:'Slepvogn',pahengsvogn:'Påhengsvogn'}[tr.kind];
+  return [truck,{title:uR,obj:'trailer',fields:[
+    {k:'n',l:'Antall aksler',type:'sel',opts:slep?[2,3,4]:[1,2,3]},
+    {k:'sp',l:`Akselavstand (cm), første fra ${refN}`,type:'list'},
+    {k:'tare.0',l:slep?'Egenvekt foran (kg)':`Egenvekt på ${refN} (kg)`},{k:'tare.1',l:slep?'Egenvekt bak (kg)':'Egenvekt på akslene (kg)'},
+    {k:'allow.0',l:slep?'Tillatt aksellast foran (kg)':semi?'Tillatt last på king-pin (kg)':'Tillatt koplingslast (kg)'},
+    {k:'allow.1',l:slep?'Tillatt aksellast bak (kg)':'Tillatt aksel-/boggilast (kg)'},
+    {k:'total',l:'Tillatt totalvekt (kg)'},
+    {k:'deck.0',l:`Lasteplan fra (cm bak ${refN})`},{k:'deck.1',l:`Lasteplan til (cm bak ${refN})`}
+  ]}];
+}
+// Nytt akseloppsett på bilen: hent akselavstander og aksellaster fra et typisk eksempel,
+// ellers havner akslene feil (f.eks. 460 cm mellom akslene i en framboggi)
+function applyLayout(t){
+  const p=PRESETS[t.n===2?'lb2':t.n===3?'lb3':t.cfg==='bb'?'lb4bb':'lb4tri'].truck;
+  t.sp=[...p.sp];t.tare=[...p.tare];t.allow=[...p.allow];t.total=p.total;
+}
+const getP=(o,k)=>k.split('.').reduce((a,p)=>a[p],o);
+function setP(o,k,v){const ps=k.split('.');const last=ps.pop();ps.reduce((a,p)=>a[p],o)[last]=v;}
+function renderVK(){
+  $('#vk').innerHTML=vkFields().map(c=>{
+    const o=state[c.obj];
+    return `<div class="vk-card"><h3>${c.title}<small>${c.obj==='truck'?'Del 1':'Del 2'}</small></h3><div class="vk-grid">`+c.fields.map(f=>{
+      const id=`vk-${c.obj}-${f.k.replace('.','-')}`,v=getP(o,f.k);
+      if(f.type==='sel')return `<label class="field"><span class="label">${f.l}</span><select id="${id}" data-o="${c.obj}" data-k="${f.k}" data-t="sel">${f.opts.map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('')}</select></label>`;
+      if(f.type==='cfg')return `<label class="field"><span class="label">${f.l}</span><select id="${id}" data-o="${c.obj}" data-k="${f.k}" data-t="cfg">${f.opts.map(([k,l])=>`<option value="${k}"${k===v?' selected':''}>${l}</option>`).join('')}</select></label>`;
+      if(f.type==='chk')return `<label class="chk" style="grid-column:1/-1"><input id="${id}" type="checkbox" data-o="${c.obj}" data-k="${f.k}" data-t="chk"${v?' checked':''}> ${f.l}</label>`;
+      if(f.type==='list')return `<label class="field"><span class="label">${f.l}</span><input id="${id}" type="text" inputmode="numeric" data-o="${c.obj}" data-k="${f.k}" data-t="list" value="${v.join('/')}"></label>`;
+      return `<label class="field"><span class="label">${f.l}</span><input id="${id}" type="number" step="10" data-o="${c.obj}" data-k="${f.k}" value="${v}"></label>`;
+    }).join('')+'</div></div>';
+  }).join('');
+}
+$('#vk').addEventListener('change',e=>{
+  const el=e.target,o=state[el.dataset.o],k=el.dataset.k,ty=el.dataset.t;if(!k)return;
+  if(ty==='chk')o[k]=el.checked;
+  else if(ty==='cfg'){o[k]=el.value;applyLayout(o);renderVK();}
+  else if(ty==='sel'){
+    const n=+el.value;o.n=n;
+    if(el.dataset.o==='truck')applyLayout(o);
+    else{while(o.sp.length<n)o.sp.push(131);o.sp.length=n;}
+    renderVK();
+  }else if(ty==='list'){
+    const a=el.value.split(/[\/,;\s]+/).filter(Boolean).map(Number);
+    const need=el.dataset.o==='truck'?o.n-1:o.n;
+    const okL=a.length===need&&a.every(x=>x>0);
+    el.closest('.field').classList.toggle('err',!okL);
+    if(!okL)return;o.sp=a;
+  }else{
+    const v=+el.value;if(!isFinite(v))return;
+    const neg=k==='deck.0'&&el.dataset.o==='trailer';
+    if(v<0&&!neg)return;setP(o,k,v);
+  }
+  if(o.deck&&o.deck[1]<=o.deck[0]+50)o.deck[1]=o.deck[0]+50;
+  fixFifth();normalize();renderFifth();renderAdd();renderItems();render();
+});
+
+/* ---------- utfordringer ---------- */
+function renderChList(){
+  $('#chList').innerHTML=CH.map((c,i)=>`<button type="button" class="ch-btn${done[c.id]?' done':''}" data-ch="${c.id}" aria-pressed="${activeCh===c.id}"><span class="n">${done[c.id]?'✓':i+1}</span>${c.title}</button>`).join('');
+}
+const UNIT={m:'m',t:'tonn',kg:'kg'};
+function parseNum(v){return parseFloat(String(v).replace(/\s/g,'').replace(',','.'));}
+function renderChShell(){
+  const el=$('#chActive');
+  const c=CH.find(c=>c.id===activeCh);
+  if(!c){el.innerHTML='';return;}
+  el.innerHTML=`<div class="ch-active"><div><h3>${CH.indexOf(c)+1}. ${c.title}</h3><p>${c.text}</p></div>
+    <div><span class="label">Mål</span><ul class="goals">${c.goals.map((g,i)=>`<li data-g="${i}"><span class="mk"></span>${g.q
+      ?`<span class="quiz"><label for="q-${i}">${g.q}</label><span><input id="q-${i}" data-q="${i}" type="text" inputmode="decimal" autocomplete="off" value="${esc(quizAns[i]??'')}"> ${UNIT[g.unit]}</span></span>`
+      :g.t}</li>`).join('')}</ul>
+    <div id="chWin"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn ghost" id="chReset">Start på nytt</button><button type="button" class="btn ghost" id="chExit">Avslutt utfordring</button></div></div></div>`;
+}
+function updateChallenge(r){
+  const c=CH.find(c=>c.id===activeCh);if(!c)return;
+  const met=c.goals.map((g,i)=>g.q?Math.abs(parseNum(quizAns[i])-g.ans(state,r))<=g.tol:!!g.f(state,r));
+  met.forEach((m,i)=>{const li=document.querySelector(`#chActive li[data-g="${i}"]`);if(!li)return;li.classList.toggle('met',m);li.querySelector('.mk').textContent=m?'✓':'';});
+  const all=met.every(Boolean);
+  if(all&&!done[c.id]){done[c.id]=true;try{localStorage.setItem('aksellast-lab.done',JSON.stringify(done));}catch(e){}renderChList();}
+  const w=$('#chWin');if(w)w.innerHTML=all?'<div class="win">Løst! Prøv gjerne neste utfordring.</div>':'';
+}
+$('#chActive').addEventListener('input',e=>{const i=e.target.dataset.q;if(i==null)return;quizAns[i]=e.target.value;render();});
+function startCh(id){
+  const c=CH.find(c=>c.id===id);activeCh=id;
+  loadPreset(c.preset,{bk:c.bk,items:c.items,truck:c.truck,trailer:c.trailer});
+  renderChShell();render();
+}
+$('#chList').addEventListener('click',e=>{const b=e.target.closest('[data-ch]');if(b)startCh(b.dataset.ch);});
+$('#chActive').addEventListener('click',e=>{
+  if(e.target.id==='chReset')startCh(activeCh);
+  if(e.target.id==='chExit'){activeCh=null;renderChList();renderChShell();renderFifth();render();}
+});
+
+/* ---------- toppvelgere ---------- */
+$('#preset').innerHTML=Object.entries(PRESETS).map(([k,p])=>`<option value="${k}">${p.label}</option>`).join('');
+$('#preset').addEventListener('change',e=>{activeCh=null;loadPreset(e.target.value);renderChShell();render();});
+$('#bk').addEventListener('click',e=>{const b=e.target.closest('[data-bk]');if(!b)return;state.bk=+b.dataset.bk;
+  document.querySelectorAll('#bk button').forEach(x=>x.setAttribute('aria-pressed',x===b));render();});
+$('#road').addEventListener('change',e=>{state.road=+e.target.value;render();});
+
+loadPreset('tb2s3');
+</script>
